@@ -23,6 +23,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
+          ASSIGNEES: ${{ vars.REVIEW_ASSIGNEES || github.repository_owner }}
         run: |
           gh label create review-check --color FFC629 --description "Weekly Google review check" --force -R "$REPO"
 
@@ -62,4 +63,7 @@ jobs:
           _Want fresh review quotes on the site? Ask your developer. The quotes are picked by hand._
           EOF
 
-          gh issue create -R "$REPO" --title "Weekly review check · $(date -u +%d\ %b\ %Y)" --label review-check --body-file body.md
+          # Assigning guarantees an email (assignees are notified even if they don't watch the repo).
+          # To notify the business owner too, set repo variable REVIEW_ASSIGNEES, e.g. "SiyadDev,ownerlogin".
+          gh issue create -R "$REPO" --title "Weekly review check · $(date -u +%d\ %b\ %Y)" --label review-check \
+            --assignee "$ASSIGNEES" --body-file body.md
