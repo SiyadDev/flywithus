@@ -30,7 +30,7 @@ The rating, total count, star breakdown and review quotes live in `src/data/revi
 4. A workflow checks the numbers add up, saves them, closes both issues and comments the result. If something doesn't
    add up it explains why in a comment; edit the issue to fix it and it retries. Cloudflare rebuilds within minutes.
 
-Nothing changed? Just close the issue. The reminder is **assigned** to the repo owner, which guarantees an email. To
+Nothing changed? Just close the issue. Forgot? Next Monday the open issue gets a ⏰ nudge comment (another email) instead of a duplicate issue. The reminder is **assigned** to the repo owner, which guarantees an email. To
 include the business owner: add their GitHub account as a collaborator (**Settings → Collaborators**), then set the
 repo variable `REVIEW_ASSIGNEES` (**Settings → Secrets and variables → Actions → Variables**) to e.g.
 `SiyadDev,theirlogin`.

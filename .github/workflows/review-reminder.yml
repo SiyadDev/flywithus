@@ -3,6 +3,7 @@ name: Weekly review check
 # Every Monday 9:00 am India time, open a reminder issue asking the owner to
 # check the Google rating. The issue links to a form pre-filled with the
 # website's current numbers (.github/ISSUE_TEMPLATE/update-reviews.yml).
+# If last week's reminder is still open, it posts a nudge comment on it instead.
 on:
   schedule:
     - cron: '30 3 * * 1' # 03:30 UTC = 09:00 IST, Mondays
@@ -27,13 +28,6 @@ jobs:
           gh label create review-check --color FFC629 --description "Weekly Google review check" --force -R "$REPO"
           gh label create review-update --color 1E8FE1 --description "New Google numbers for the website" --force -R "$REPO"
 
-          # Don't pile up reminders: if last week's is still open, leave it.
-          open=$(gh issue list -R "$REPO" --label review-check --state open --json number --jq 'length')
-          if [ "$open" -gt 0 ]; then
-            echo "A review-check issue is already open; not creating another."
-            exit 0
-          fi
-
           rating=$(jq -r .rating src/data/reviews.json)
           count=$(jq -r .count src/data/reviews.json)
           b5=$(jq -r .breakdown.five src/data/reviews.json)
@@ -45,6 +39,25 @@ jobs:
           # Link that opens the update form already filled in with today's numbers.
           form="https://github.com/$REPO/issues/new?template=update-reviews.yml&rating=$rating&count=$count&five=$b5&four=$b4&three=$b3&two=$b2&one=$b1"
           google="https://www.google.com/search?q=FLY+WITH+US+TOURS+%26+TRAVELS+Mannarkkad+reviews"
+
+          # Forgot last week? Don't open a second issue; comment on the open one instead.
+          # The comment emails the assignees again, with this week's link.
+          open=$(gh issue list -R "$REPO" --label review-check --state open --json number --jq '.[0].number // empty')
+          if [ -n "$open" ]; then
+            cat > nudge.md <<EOF
+          ⏰ **Still waiting. This is this week's reminder.**
+
+          **On the website now:** **$rating★** from **$count reviews** · 5★ $b5 · 4★ $b4 · 3★ $b3 · 2★ $b2 · 1★ $b1
+
+          1. [Check our Google reviews]($google)
+          2. If anything changed → [**update the numbers**]($form) (pre-filled with the numbers above)
+
+          Nothing changed? Just close this issue.
+          EOF
+            gh issue comment "$open" -R "$REPO" --body-file nudge.md
+            echo "Reminder #$open was still open; posted a nudge instead of a new issue."
+            exit 0
+          fi
 
           cat > body.md <<EOF
           ### 2-minute check ⭐
