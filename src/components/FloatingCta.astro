@@ -1,0 +1,106 @@
+---
+import Icon from './Icon.astro';
+import { business, wa } from '../data/site';
+---
+
+<div class="float" data-float>
+  <a class="fl fl-call" href={`tel:${business.phones[0].tel}`} aria-label={`Call ${business.phones[0].label}`}>
+    <Icon name="phone" size={22} />
+  </a>
+  <a class="fl fl-wa" href={wa('Hi Fly With Us, I have an enquiry.')} target="_blank" rel="noopener" aria-label="Chat on WhatsApp">
+    <Icon name="whatsapp" size={28} />
+    <span class="fl-label">Chat with us</span>
+  </a>
+</div>
+
+<style>
+  .float {
+    position: fixed;
+    right: max(16px, env(safe-area-inset-right));
+    bottom: max(16px, env(safe-area-inset-bottom));
+    z-index: 40;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+    opacity: 0;
+    transform: translateY(30px) scale(0.9);
+    pointer-events: none;
+    transition:
+      opacity 0.5s var(--ease-out),
+      transform 0.6s var(--ease-out);
+  }
+  .float.show {
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+  }
+  .fl {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 999px;
+    text-decoration: none;
+    color: #fff;
+    box-shadow: 0 16px 30px -12px rgba(5, 13, 58, 0.55);
+    transition: transform 0.4s var(--ease-out);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .fl:active {
+    transform: scale(0.94);
+  }
+  .fl-call {
+    width: 48px;
+    height: 48px;
+    background: var(--navy);
+  }
+  .fl-wa {
+    height: 60px;
+    min-width: 60px;
+    padding: 0 16px;
+    background: var(--wa);
+    position: relative;
+  }
+  .fl-wa::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    box-shadow: 0 0 0 0 rgba(31, 168, 85, 0.55);
+    animation: ring 2.6s var(--ease-out) infinite;
+  }
+  @keyframes ring {
+    0% {
+      box-shadow: 0 0 0 0 rgba(31, 168, 85, 0.5);
+    }
+    70%,
+    100% {
+      box-shadow: 0 0 0 16px rgba(31, 168, 85, 0);
+    }
+  }
+  .fl-label {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.9rem;
+    max-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    transition: max-width 0.5s var(--ease-out);
+  }
+  @media (hover: hover) {
+    .fl:hover {
+      transform: translateY(-3px);
+    }
+    .fl-wa:hover .fl-label {
+      max-width: 140px;
+    }
+  }
+</style>
+
+<script>
+  const el = document.querySelector<HTMLElement>('[data-float]')!;
+  const onScroll = () => el.classList.toggle('show', window.scrollY > window.innerHeight * 0.6);
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+</script>

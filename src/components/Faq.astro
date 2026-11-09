@@ -1,0 +1,151 @@
+---
+import Icon from './Icon.astro';
+import SplitHeading from './SplitHeading.astro';
+import { faqs, wa } from '../data/site';
+---
+
+<section class="section faq" id="faq">
+  <div class="wrap faq-grid">
+    <div class="faq-side">
+      <div class="gate" data-reveal><span>Gate 07</span><span>Questions</span></div>
+      <SplitHeading text="Questions we hear at the counter." />
+      <p class="lede" data-reveal style="--d:2">Still unsure? Ask us directly on WhatsApp or give us a call.</p>
+      <a class="btn btn-wa" href={wa('Hi Fly With Us, I have a question.')} target="_blank" rel="noopener" data-reveal style="--d:3">
+        <Icon name="whatsapp" size={18} /> Ask a question
+      </a>
+    </div>
+
+    <div class="faq-list" data-reveal style="--d:2">
+      {
+        faqs.map((f, i) => (
+          <details class="qa" name="faq" open={i === 0}>
+            <summary>
+              <span class="mono n">{String(i + 1).padStart(2, '0')}</span>
+              <span class="q">{f.q}</span>
+              <span class="pm" aria-hidden="true" />
+            </summary>
+            <div class="a">
+              <p>{f.a}</p>
+            </div>
+          </details>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .faq-grid {
+    display: grid;
+    gap: 3rem;
+  }
+  @media (min-width: 960px) {
+    .faq-grid {
+      grid-template-columns: 0.8fr 1.2fr;
+      gap: 5rem;
+      align-items: start;
+    }
+    .faq-side {
+      position: sticky;
+      top: 120px;
+    }
+  }
+  .faq-side .lede {
+    margin: 1.2rem 0 1.8rem;
+  }
+  .faq-list {
+    border-top: 1px solid var(--rule);
+  }
+  .qa {
+    border-bottom: 1px solid var(--rule);
+    interpolate-size: allow-keywords;
+  }
+  .qa::details-content {
+    block-size: 0;
+    overflow: hidden;
+    transition:
+      block-size 0.5s var(--ease-out),
+      content-visibility 0.5s allow-discrete;
+  }
+  .qa[open]::details-content {
+    block-size: auto;
+  }
+  summary {
+    list-style: none;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 1rem;
+    align-items: center;
+    padding: 1.4rem 0.25rem;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
+  .n {
+    font-size: 0.72rem;
+    color: var(--sky);
+  }
+  .q {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.05rem, 1.6vw, 1.3rem);
+    color: var(--navy);
+    line-height: 1.3;
+  }
+  .pm {
+    position: relative;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1.5px solid var(--rule);
+    transition:
+      background 0.4s,
+      border-color 0.4s,
+      transform 0.5s var(--ease-out);
+  }
+  .pm::before,
+  .pm::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 12px;
+    height: 1.5px;
+    background: var(--navy);
+    transform: translate(-50%, -50%);
+    transition:
+      transform 0.5s var(--ease-out),
+      background 0.4s;
+  }
+  .pm::after {
+    transform: translate(-50%, -50%) rotate(90deg);
+  }
+  .qa[open] .pm {
+    background: var(--navy);
+    border-color: var(--navy);
+    transform: rotate(180deg);
+  }
+  .qa[open] .pm::before,
+  .qa[open] .pm::after {
+    background: #fff;
+  }
+  .qa[open] .pm::after {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  summary:hover .pm {
+    border-color: var(--navy);
+  }
+  .a p {
+    margin: 0;
+    padding: 0 3.2rem 1.6rem 2.6rem;
+    color: var(--ink-2);
+    max-width: 40rem;
+  }
+  @media (max-width: 600px) {
+    .a p {
+      padding: 0 0.25rem 1.4rem;
+    }
+  }
+</style>

@@ -1,0 +1,162 @@
+---
+import Icon from './Icon.astro';
+import Logo from './Logo.astro';
+import { business, services, wa, photoCredits } from '../data/site';
+const year = new Date().getFullYear();
+---
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot-cta">
+      <p class="script">Ready when you are</p>
+      <a class="foot-big" href={wa('Hi Fly With Us, I would like to plan a trip.')} target="_blank" rel="noopener">
+        Let's book your next flight <Icon name="arrowUpRight" size={48} stroke={2.2} />
+      </a>
+    </div>
+
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <Logo size="md" tone="light" sub />
+        <p>{business.tagline}.</p>
+      </div>
+      <div>
+        <p class="mono h">Services</p>
+        <ul>{services.slice(0, 5).map((s) => <li><a href="#services">{s.title}</a></li>)}</ul>
+      </div>
+      <div>
+        <p class="mono h">More</p>
+        <ul>{services.slice(5).map((s) => <li><a href="#services">{s.title}</a></li>)}</ul>
+      </div>
+      <div>
+        <p class="mono h">Contact</p>
+        <ul>
+          {business.phones.map((p) => <li><a href={`tel:${p.tel}`}>{p.label}</a></li>)}
+          <li><a href={`mailto:${business.email}`}>{business.email}</a></li>
+          <li><a href={business.instagram} target="_blank" rel="noopener">Instagram {business.instagramHandle}</a></li>
+          <li>{business.address}</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="foot-bottom">
+      <span>© {year} {business.fullName}. All rights reserved.</span>
+      <details class="credits">
+        <summary>Photo credits</summary>
+        <p>
+          Destination & sky photos via Wikimedia Commons:{' '}
+          {photoCredits.map((c, i) => (
+            <>
+              <a href={c.url} target="_blank" rel="noopener">{c.what}</a> by {c.who}{i < photoCredits.length - 1 ? '; ' : '.'}
+            </>
+          ))}
+        </p>
+      </details>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .foot {
+    background: var(--night);
+    color: rgba(255, 255, 255, 0.72);
+    padding: clamp(72px, 10vw, 130px) 0 calc(28px + env(safe-area-inset-bottom));
+  }
+  .foot-cta {
+    padding-bottom: clamp(48px, 7vw, 90px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .foot-cta .script {
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    color: #a9c8ef;
+    margin: 0 0 0.4rem;
+  }
+  .foot-big {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    flex-wrap: wrap;
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: clamp(2.3rem, 6.4vw, 6rem);
+    line-height: 0.98;
+    letter-spacing: -0.03em;
+    color: #fff;
+    text-decoration: none;
+    background: linear-gradient(var(--signal), var(--signal)) 0 100% / 0 4px no-repeat;
+    transition: background-size 0.7s var(--ease-out);
+  }
+  .foot-big:hover {
+    background-size: 100% 4px;
+  }
+  .foot-big :global(.icon) {
+    width: 0.8em;
+    height: 0.8em;
+    color: var(--signal);
+    transition: transform 0.5s var(--ease-out);
+  }
+  .foot-big:hover :global(.icon) {
+    transform: translate(6px, -6px);
+  }
+  .foot-grid {
+    display: grid;
+    gap: 2.5rem;
+    padding: clamp(48px, 6vw, 72px) 0;
+  }
+  @media (min-width: 760px) {
+    .foot-grid {
+      grid-template-columns: 1.4fr 1fr 1fr 1.3fr;
+    }
+  }
+  .foot-brand p {
+    margin: 1rem 0 0;
+  }
+  .foot-brand :global(.logo) {
+    align-items: flex-start;
+  }
+  .h {
+    font-size: 0.7rem;
+    color: var(--signal);
+    margin: 0 0 1rem;
+  }
+  .foot ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 0.55rem;
+    font-size: 0.94rem;
+  }
+  .foot ul a {
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+  .foot ul a:hover {
+    color: #fff;
+  }
+  .foot-bottom {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.5);
+  }
+  @media (max-width: 760px) {
+    .foot {
+      padding-bottom: calc(150px + env(safe-area-inset-bottom));
+    }
+  }
+  .credits summary {
+    cursor: pointer;
+  }
+  .credits p {
+    max-width: 46rem;
+    margin: 0.6rem 0 0;
+    line-height: 1.6;
+  }
+  .credits a {
+    color: rgba(255, 255, 255, 0.75);
+  }
+</style>

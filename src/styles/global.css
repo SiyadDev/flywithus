@@ -1,0 +1,350 @@
+/* ───────────────────────── Tokens ───────────────────────── */
+:root {
+  /* Brand — sampled from the Fly With Us logo & office */
+  --navy: #0b1f7e;
+  --navy-deep: #07145a;
+  --night: #050d3a;
+  --sky: #1e8fe1;
+  --steel: #5a8cc6;
+  --mist: #dbe8f7;
+
+  /* Paper & ink */
+  --paper: #f6f4ef;
+  --paper-2: #ece8df;
+  --card: #fffdf9;
+  --ink: #0d1433;
+  --ink-2: #3e4566;
+  --ink-3: #6b7190;
+  --rule: #d9d4c8;
+
+  /* Airport signage accent — used sparingly */
+  --signal: #ffc629;
+  --wa: #1fa855;
+
+  --font-display: 'Montserrat', system-ui, sans-serif;
+  --font-body: 'Archivo', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --font-script: 'Great Vibes', cursive;
+
+  --gutter: clamp(16px, 4vw, 56px);
+  --max: 1320px;
+  --radius: 14px;
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/* ───────────────────────── Base ───────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  scroll-padding-top: 88px;
+}
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: clip;
+}
+img {
+  max-width: 100%;
+  display: block;
+}
+a {
+  color: inherit;
+}
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+::selection {
+  background: var(--navy);
+  color: #fff;
+}
+:focus-visible {
+  outline: 2px solid var(--sky);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.wrap {
+  width: 100%;
+  max-width: var(--max);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+/* ───────────────────────── Type ───────────────────────── */
+.display {
+  font-family: var(--font-display);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 0.92;
+  text-transform: uppercase;
+}
+.h2 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(2.1rem, 4.6vw, 3.9rem);
+  line-height: 1;
+  letter-spacing: -0.025em;
+  margin: 0;
+  color: var(--navy);
+}
+.script {
+  font-family: var(--font-script);
+  font-weight: 400;
+  color: var(--steel);
+  letter-spacing: 0;
+  text-transform: none;
+}
+.mono {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.lede {
+  font-size: clamp(1.05rem, 1.4vw, 1.2rem);
+  color: var(--ink-2);
+  max-width: 34rem;
+}
+
+/* Gate label — the airport wayfinding motif */
+.gate {
+  display: inline-flex;
+  align-items: stretch;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 1.4rem;
+}
+.gate > span {
+  padding: 0.42rem 0.7rem;
+}
+.gate > span:first-child {
+  background: var(--signal);
+  color: var(--night);
+}
+.gate > span:last-child {
+  background: var(--navy);
+  color: #fff;
+}
+.gate.on-dark > span:last-child {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* ───────────────────────── Buttons ───────────────────────── */
+.btn {
+  --bg: var(--navy);
+  --fg: #fff;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.95rem 1.35rem;
+  border-radius: 999px;
+  border: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  cursor: pointer;
+  overflow: hidden;
+  isolation: isolate;
+  transition:
+    transform 0.35s var(--ease-out),
+    box-shadow 0.35s var(--ease-out);
+  -webkit-tap-highlight-color: transparent;
+}
+.btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--sky);
+  transform: translateY(101%);
+  transition: transform 0.45s var(--ease-out);
+  border-radius: inherit;
+}
+.btn .icon {
+  transition: transform 0.45s var(--ease-out);
+}
+@media (hover: hover) {
+  .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 30px -14px rgba(11, 31, 126, 0.6);
+  }
+  .btn:hover::after {
+    transform: translateY(0);
+  }
+  .btn:hover .icon-arrow {
+    transform: translateX(4px);
+  }
+}
+.btn:active {
+  transform: translateY(0) scale(0.98);
+}
+.btn-wa {
+  --bg: var(--wa);
+}
+.btn-wa::after {
+  background: #168a45;
+}
+.btn-light {
+  --bg: #fff;
+  --fg: var(--navy);
+}
+.btn-light::after {
+  background: var(--mist);
+}
+.btn-ghost {
+  --bg: transparent;
+  --fg: currentColor;
+  box-shadow: inset 0 0 0 1.5px currentColor;
+}
+.btn-ghost::after {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.link-arrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--navy);
+  text-decoration: none;
+  background: linear-gradient(currentColor, currentColor) 0 100% / 0 1.5px no-repeat;
+  transition: background-size 0.4s var(--ease-out);
+  padding-bottom: 2px;
+}
+.link-arrow:hover {
+  background-size: 100% 1.5px;
+}
+
+/* ───────────────────────── Sections ───────────────────────── */
+.section {
+  padding-block: clamp(80px, 11vw, 160px);
+  position: relative;
+}
+.section-head {
+  display: grid;
+  gap: 1.2rem;
+  margin-bottom: clamp(40px, 6vw, 72px);
+}
+@media (min-width: 900px) {
+  .section-head.split {
+    grid-template-columns: 1.1fr 0.9fr;
+    align-items: end;
+    gap: 4rem;
+  }
+}
+
+/* Perforation — ticket edge */
+.perf {
+  height: 2px;
+  background-image: radial-gradient(circle, var(--rule) 1.2px, transparent 1.6px);
+  background-size: 10px 2px;
+}
+
+/* ───────────────────────── Reveal animations ───────────────────────── */
+.js [data-reveal] {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 0.9s var(--ease-out),
+    transform 0.9s var(--ease-out);
+  transition-delay: calc(var(--d, 0) * 80ms);
+}
+.js [data-reveal='left'] {
+  transform: translateX(-36px);
+}
+.js [data-reveal='scale'] {
+  transform: scale(0.94);
+}
+.js [data-reveal='clip'] {
+  opacity: 1;
+  transform: none;
+  clip-path: inset(0 0 100% 0);
+  transition: clip-path 1.2s var(--ease-in-out);
+  transition-delay: calc(var(--d, 0) * 80ms);
+}
+.js [data-reveal].in {
+  opacity: 1;
+  transform: none;
+}
+.js [data-reveal='clip'].in {
+  clip-path: inset(0 0 0 0);
+}
+
+/* Word-by-word heading reveal */
+.split-words .w {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+}
+.split-words .w > span {
+  display: inline-block;
+}
+.js .split-words .w > span {
+  transform: translateY(105%);
+  transition: transform 1s var(--ease-out);
+  transition-delay: calc(var(--i) * 55ms);
+}
+.js .split-words.in .w > span {
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+  }
+  .js [data-reveal],
+  .js .split-words .w > span {
+    opacity: 1 !important;
+    transform: none !important;
+    clip-path: none !important;
+  }
+}

@@ -1,0 +1,383 @@
+---
+import Icon from './Icon.astro';
+import SplitHeading from './SplitHeading.astro';
+import { destinations, wa } from '../data/site';
+const msg = (c: string, k: string) => wa(`Hi Fly With Us, can you share fares to ${c} (${k})?`);
+---
+
+<section class="section dest" id="destinations">
+  <div class="wrap">
+    <div class="section-head split">
+      <div>
+        <div class="gate on-dark" data-reveal><span>Gate 05</span><span>Departures</span></div>
+        <SplitHeading text="Where Mannarkkad is flying." class="h2 on-dark" />
+      </div>
+      <p class="lede" data-reveal style="--d:2">
+        From work in the Gulf to holidays in Asia, these are popular routes from our corner of Kerala. Tap a city to ask for today's fare.
+      </p>
+    </div>
+
+    <div class="dest-grid" data-board>
+      <div class="dest-photo" data-reveal="clip" aria-hidden="true">
+        {
+          destinations.map((d, i) => (
+            <img src={d.image} alt="" loading="lazy" class={i === 0 ? 'on' : ''} data-photo={d.code} />
+          ))
+        }
+        <div class="photo-cap">
+          <span class="mono" data-cap-country>{destinations[0].country}</span>
+          <strong data-cap-city>{destinations[0].city}</strong>
+        </div>
+      </div>
+
+      <div class="board" data-reveal style="--d:2">
+        <div class="board-head mono" aria-hidden="true">
+          <span>Code</span><span>Destination</span><span class="hide-sm">We handle</span><span class="r">Status</span>
+        </div>
+        <ul>
+          {
+            destinations.map((d, i) => (
+              <li>
+                <a
+                  class={`row ${i === 0 ? 'active' : ''}`}
+                  href={msg(d.city, d.code)}
+                  target="_blank"
+                  rel="noopener"
+                  data-row={d.code}
+                  data-city={d.city}
+                  data-country={d.country}
+                >
+                  <span class="code flap" data-flap={d.code}>
+                    {d.code.split('').map((c) => (
+                      <span class="cell">{c}</span>
+                    ))}
+                  </span>
+                  <span class="city">
+                    {d.city}
+                    <small>{d.country}</small>
+                  </span>
+                  <span class="note hide-sm">{d.note}</span>
+                  <span class="status r">
+                    <span class="mono">Get fare</span>
+                    <Icon name="arrowUpRight" size={16} />
+                  </span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+        <p class="board-foot">
+          Not on the board? <a href={wa('Hi Fly With Us, can you share fares to ')} target="_blank" rel="noopener">Ask for any destination →</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .dest {
+    background: var(--night);
+    color: #fff;
+  }
+  .dest :global(.h2.on-dark) {
+    color: #fff;
+  }
+  .dest .lede {
+    color: rgba(255, 255, 255, 0.72);
+  }
+  .dest-grid {
+    display: grid;
+    gap: 1.5rem;
+  }
+  @media (min-width: 1000px) {
+    .dest-grid {
+      grid-template-columns: 0.9fr 1.1fr;
+      gap: 2.5rem;
+      align-items: stretch;
+    }
+  }
+  .dest-photo {
+    position: relative;
+    border-radius: 18px;
+    overflow: hidden;
+    aspect-ratio: 4 / 3;
+    background: #0a1650;
+  }
+  @media (min-width: 1000px) {
+    .dest-photo {
+      aspect-ratio: auto;
+      min-height: 560px;
+    }
+  }
+  .dest-photo img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transform: scale(1.08);
+    transition:
+      opacity 0.9s var(--ease-out),
+      transform 2.4s var(--ease-out);
+  }
+  .dest-photo img.on {
+    opacity: 1;
+    transform: scale(1);
+  }
+  .dest-photo::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 50%, rgba(5, 13, 58, 0.85));
+  }
+  .photo-cap {
+    position: absolute;
+    left: 24px;
+    bottom: 22px;
+    z-index: 1;
+    display: grid;
+  }
+  .photo-cap .mono {
+    font-size: 0.72rem;
+    color: var(--signal);
+  }
+  .photo-cap strong {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: clamp(2.2rem, 5vw, 3.6rem);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+
+  /* Board */
+  .board {
+    background: #030824;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 18px;
+    padding: 10px 10px 18px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  }
+  .board-head,
+  .row {
+    display: grid;
+    grid-template-columns: 112px 1fr auto;
+    align-items: center;
+    gap: 14px;
+  }
+  @media (min-width: 640px) {
+    .board-head,
+    .row {
+      grid-template-columns: 122px 1.1fr 1fr auto;
+    }
+  }
+  @media (max-width: 639px) {
+    .hide-sm {
+      display: none;
+    }
+  }
+  .board-head {
+    padding: 10px 14px 12px;
+    font-size: 0.64rem;
+    color: rgba(255, 255, 255, 0.45);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .r {
+    justify-self: end;
+    text-align: right;
+  }
+  .board ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .row {
+    padding: 12px 14px;
+    border-radius: 10px;
+    text-decoration: none;
+    color: #fff;
+    position: relative;
+    transition: background 0.35s var(--ease-out);
+  }
+  .row + .row,
+  li + li .row {
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+  }
+  .row:hover,
+  .row.active {
+    background: rgba(30, 143, 225, 0.14);
+  }
+  .row.active .cell {
+    background: linear-gradient(180deg, #223082 0 49%, #18246b 51% 100%);
+    box-shadow:
+      inset 0 -1px 0 rgba(0, 0, 0, 0.4),
+      0 0 14px -4px rgba(255, 198, 41, 0.55);
+  }
+  .flap {
+    display: flex;
+    gap: 3px;
+  }
+  .cell {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 40px;
+    border-radius: 4px;
+    background: linear-gradient(180deg, #17205a 0 49%, #0f174a 51% 100%);
+    font-family: var(--font-mono);
+    font-weight: 600;
+    font-size: 1.2rem;
+    color: var(--signal);
+    box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.4);
+  }
+  .cell::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 1px;
+    background: rgba(0, 0, 0, 0.55);
+  }
+  .cell.flip {
+    animation: flip 0.09s linear;
+  }
+  @keyframes flip {
+    50% {
+      transform: scaleY(0.3);
+    }
+  }
+  .city {
+    display: grid;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.05rem;
+    line-height: 1.2;
+  }
+  .city small {
+    font-family: var(--font-body);
+    font-weight: 400;
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.5);
+  }
+  .note {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.65);
+  }
+  .status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #7fe0a3;
+  }
+  .status .mono {
+    font-size: 0.68rem;
+  }
+  @media (max-width: 420px) {
+    .status .mono {
+      display: none;
+    }
+  }
+  .row.active .status {
+    animation: blink 1.6s steps(2, jump-none) infinite;
+  }
+  @keyframes blink {
+    50% {
+      opacity: 0.35;
+    }
+  }
+  .board-foot {
+    margin: 14px 14px 0;
+    font-size: 0.88rem;
+    color: rgba(255, 255, 255, 0.6);
+  }
+  .board-foot a {
+    color: var(--signal);
+    font-weight: 600;
+    text-decoration: none;
+  }
+</style>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-board]')!;
+  const rows = [...root.querySelectorAll<HTMLAnchorElement>('[data-row]')];
+  const photos = [...root.querySelectorAll<HTMLImageElement>('[data-photo]')];
+  const capCity = root.querySelector<HTMLElement>('[data-cap-city]')!;
+  const capCountry = root.querySelector<HTMLElement>('[data-cap-country]')!;
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const A = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+  const flapRow = (row: HTMLElement, delay = 0) => {
+    if (reduce) return;
+    const cells = [...row.querySelectorAll<HTMLElement>('.cell')];
+    const target = row.dataset.row!;
+    cells.forEach((cell, i) => {
+      let n = 0;
+      const max = 5 + i * 3 + Math.floor(Math.random() * 3);
+      setTimeout(() => {
+        const iv = setInterval(() => {
+          n++;
+          cell.textContent = n >= max ? target[i] : A[Math.floor(Math.random() * 26)];
+          cell.classList.remove('flip');
+          void cell.offsetWidth;
+          cell.classList.add('flip');
+          if (n >= max) clearInterval(iv);
+        }, 70);
+      }, delay);
+    });
+  };
+
+  let current = rows[0].dataset.row;
+  const activate = (row: HTMLAnchorElement) => {
+    const code = row.dataset.row!;
+    if (code === current) return;
+    current = code;
+    rows.forEach((r) => r.classList.toggle('active', r === row));
+    photos.forEach((p) => p.classList.toggle('on', p.dataset.photo === code));
+    capCity.textContent = row.dataset.city!;
+    capCountry.textContent = row.dataset.country!;
+    flapRow(row);
+  };
+
+  // Board flips in when it scrolls into view
+  const io = new IntersectionObserver(
+    (entries) => {
+      if (entries.some((e) => e.isIntersecting)) {
+        rows.forEach((r, i) => flapRow(r, i * 90));
+        io.disconnect();
+        startAuto();
+      }
+    },
+    { threshold: 0.3 },
+  );
+  io.observe(root);
+
+  // Auto-advance until the visitor interacts
+  let auto: number | undefined;
+  let idx = 0;
+  const startAuto = () => {
+    if (reduce) return;
+    auto = window.setInterval(() => {
+      idx = (idx + 1) % rows.length;
+      activate(rows[idx]);
+    }, 3800);
+  };
+  const stopAuto = () => {
+    if (auto) clearInterval(auto);
+    auto = undefined;
+  };
+
+  rows.forEach((r, i) => {
+    r.addEventListener('pointerenter', () => {
+      stopAuto();
+      idx = i;
+      activate(r);
+    });
+    r.addEventListener('focus', () => {
+      stopAuto();
+      idx = i;
+      activate(r);
+    });
+  });
+</script>

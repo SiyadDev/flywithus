@@ -1,0 +1,180 @@
+---
+import Icon from './Icon.astro';
+import { business, reviews } from '../data/site';
+const writeUrl = business.reviewsUrl;
+---
+
+<section class="rating" id="reviews">
+  <div class="wrap rating-inner">
+    <div class="score" data-reveal>
+      <span class="big" data-count-to={business.rating} data-decimals="1">{business.rating}</span>
+      <span class="stars" aria-label={`${business.rating} out of 5 stars`}>
+        {[0, 1, 2, 3, 4].map((i) => <span class="s" style={`--i:${i}`}><Icon name="star" size={26} /></span>)}
+      </span>
+    </div>
+    <div class="say" data-reveal style="--d:2">
+      <p class="mono kicker">Google reviews</p>
+      <p class="quote">
+        <span data-count-to={business.reviewCount}>{business.reviewCount}</span> travellers have rated us on Google, with an average of
+        {business.rating} out of 5.
+      </p>
+      <div class="actions">
+        <a class="btn btn-light" href={business.reviewsUrl} target="_blank" rel="noopener">
+          Read the reviews <Icon name="arrowUpRight" size={18} />
+        </a>
+        <a class="btn btn-ghost" href={writeUrl} target="_blank" rel="noopener">Travelled with us? Leave one</a>
+      </div>
+    </div>
+  </div>
+
+  {
+    reviews.length > 0 && (
+      <div class="marquee" aria-label="Customer reviews">
+        <div class="marquee-track">
+          {[0, 1].map((k) =>
+            reviews.map((r) => (
+              <figure class="rv" aria-hidden={k === 1 ? 'true' : undefined}>
+                <span class="rv-stars">
+                  {[0, 1, 2, 3, 4].map(() => (
+                    <Icon name="star" size={14} />
+                  ))}
+                </span>
+                <blockquote>{r.text}</blockquote>
+                <figcaption>
+                  {r.name}
+                  {r.when && <span> · {r.when}</span>}
+                </figcaption>
+              </figure>
+            )),
+          )}
+        </div>
+      </div>
+    )
+  }
+</section>
+
+<style>
+  .rating {
+    background: var(--navy);
+    color: #fff;
+    padding-block: clamp(64px, 9vw, 120px);
+    position: relative;
+    overflow: hidden;
+  }
+  .rating::before {
+    content: 'FLY WITH US';
+    position: absolute;
+    right: -2vw;
+    bottom: -0.22em;
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: clamp(6rem, 18vw, 17rem);
+    line-height: 1;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(255, 255, 255, 0.09);
+    white-space: nowrap;
+    pointer-events: none;
+  }
+  .rating-inner {
+    position: relative;
+    display: grid;
+    gap: 2.5rem;
+    align-items: center;
+  }
+  @media (min-width: 900px) {
+    .rating-inner {
+      grid-template-columns: auto 1fr;
+      gap: 5rem;
+    }
+  }
+  .score {
+    display: grid;
+    gap: 0.6rem;
+  }
+  .big {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: clamp(6rem, 15vw, 12rem);
+    line-height: 0.8;
+    letter-spacing: -0.04em;
+  }
+  .stars {
+    display: flex;
+    gap: 4px;
+    color: var(--signal);
+  }
+  .js .stars .s {
+    opacity: 0;
+    transform: scale(0.3) rotate(-40deg);
+    transition:
+      opacity 0.4s,
+      transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition-delay: calc(400ms + var(--i) * 90ms);
+  }
+  .js .score.in .stars .s {
+    opacity: 1;
+    transform: none;
+  }
+  .kicker {
+    font-size: 0.72rem;
+    color: #a9c8ef;
+    margin: 0 0 0.8rem;
+  }
+  .quote {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.4rem, 2.6vw, 2.2rem);
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    margin: 0 0 2rem;
+    max-width: 40rem;
+  }
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+  }
+
+  .marquee {
+    margin-top: 4rem;
+    overflow: hidden;
+    mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  }
+  .marquee-track {
+    display: flex;
+    gap: 16px;
+    width: max-content;
+    animation: slide 50s linear infinite;
+  }
+  .marquee:hover .marquee-track {
+    animation-play-state: paused;
+  }
+  @keyframes slide {
+    to {
+      transform: translateX(calc(-50% - 8px));
+    }
+  }
+  .rv {
+    width: 340px;
+    margin: 0;
+    padding: 22px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .rv-stars {
+    color: var(--signal);
+    display: flex;
+    gap: 2px;
+  }
+  .rv blockquote {
+    margin: 0.8rem 0;
+    font-size: 0.98rem;
+    line-height: 1.55;
+  }
+  .rv figcaption {
+    font-weight: 600;
+    font-size: 0.88rem;
+    color: #a9c8ef;
+  }
+</style>

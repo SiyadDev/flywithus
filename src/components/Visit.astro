@@ -1,0 +1,184 @@
+---
+import Icon from './Icon.astro';
+import SplitHeading from './SplitHeading.astro';
+import { business, wa } from '../data/site';
+---
+
+<section class="section visit" id="visit">
+  <div class="wrap">
+    <div class="section-head split">
+      <div>
+        <div class="gate" data-reveal><span>Gate 08</span><span>Visit us</span></div>
+        <SplitHeading text="A real desk, opposite the Police Station." />
+      </div>
+      <p class="lede" data-reveal style="--d:2">
+        Walk in with your documents and questions. Our office is in the middle of Mannarkkad and easy to find.
+      </p>
+    </div>
+
+    <div class="visit-grid">
+      <figure class="office" data-reveal="clip">
+        <img src="/images/office.webp" alt="Inside the Fly With Us Tours & Travels office in Mannarkkad" loading="lazy" data-parallax-img />
+        <figcaption class="mono">Our office · Mannarkkad</figcaption>
+      </figure>
+
+      <div class="card-contact" data-reveal style="--d:2">
+        <div class="cc-block">
+          <span class="mono cc-label"><Icon name="pin" size={15} /> Address</span>
+          <p class="cc-big">{business.fullName}</p>
+          <p>{business.address}</p>
+          <a class="link-arrow" href={business.directionsUrl} target="_blank" rel="noopener">Get directions <Icon name="arrow" size={16} /></a>
+        </div>
+        <div class="perf"></div>
+        <div class="cc-block">
+          <span class="mono cc-label"><Icon name="phone" size={15} /> Call</span>
+          {business.phones.map((p) => <a class="cc-phone" href={`tel:${p.tel}`}>{p.label}</a>)}
+        </div>
+        <div class="perf"></div>
+        <div class="cc-row">
+          <a href={`mailto:${business.email}`} class="cc-chip"><Icon name="mail" size={17} /> {business.email}</a>
+          <a href={business.instagram} class="cc-chip" target="_blank" rel="noopener"><Icon name="instagram" size={17} /> {business.instagramHandle}</a>
+        </div>
+        <a class="btn btn-wa cc-wa" href={wa('Hi Fly With Us, I would like to visit the office.')} target="_blank" rel="noopener">
+          <Icon name="whatsapp" size={18} /> Message before you come
+        </a>
+      </div>
+
+      <div class="map" data-reveal style="--d:3">
+        <iframe
+          title="Map showing Fly With Us Tours & Travels, Mannarkkad"
+          src={business.mapEmbed}
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          allowfullscreen></iframe>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .visit-grid {
+    display: grid;
+    gap: 16px;
+  }
+  @media (min-width: 960px) {
+    .visit-grid {
+      grid-template-columns: 1.25fr 1fr;
+      grid-template-rows: auto 320px;
+    }
+    .map {
+      grid-column: 1 / -1;
+    }
+  }
+  .office {
+    position: relative;
+    margin: 0;
+    border-radius: 18px;
+    overflow: hidden;
+    min-height: 340px;
+  }
+  .office img {
+    position: absolute;
+    inset: -6% 0;
+    width: 100%;
+    height: 112%;
+    object-fit: cover;
+  }
+  .office figcaption {
+    position: absolute;
+    left: 16px;
+    bottom: 16px;
+    background: var(--signal);
+    color: var(--night);
+    font-size: 0.7rem;
+    padding: 0.4rem 0.6rem;
+    border-radius: 5px;
+  }
+  .card-contact {
+    background: var(--card);
+    border: 1px solid var(--rule);
+    border-radius: 18px;
+    padding: clamp(22px, 3vw, 34px);
+    display: grid;
+    gap: 1.2rem;
+    align-content: start;
+  }
+  .cc-block {
+    display: grid;
+    gap: 0.3rem;
+  }
+  .cc-block p {
+    margin: 0;
+    color: var(--ink-2);
+  }
+  .cc-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.68rem;
+    color: var(--sky);
+    margin-bottom: 0.3rem;
+  }
+  .cc-big {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 1.25rem;
+    color: var(--navy) !important;
+  }
+  .cc-block .link-arrow {
+    margin-top: 0.5rem;
+    justify-self: start;
+  }
+  .cc-phone {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(1.4rem, 2.4vw, 1.75rem);
+    color: var(--navy);
+    text-decoration: none;
+    letter-spacing: -0.01em;
+    transition: color 0.3s;
+  }
+  .cc-phone:hover {
+    color: var(--sky);
+  }
+  .cc-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .cc-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.55rem 0.85rem;
+    border-radius: 999px;
+    background: var(--paper-2);
+    font-size: 0.88rem;
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--navy);
+    transition: background 0.3s;
+    overflow-wrap: anywhere;
+  }
+  .cc-chip:hover {
+    background: var(--mist);
+  }
+  .cc-wa {
+    justify-self: start;
+  }
+  .map {
+    border-radius: 18px;
+    overflow: hidden;
+    min-height: 300px;
+    background: var(--paper-2);
+    border: 1px solid var(--rule);
+  }
+  .map iframe {
+    width: 100%;
+    height: 100%;
+    min-height: 300px;
+    border: 0;
+    display: block;
+    filter: saturate(0.85) contrast(1.02);
+  }
+</style>

@@ -1,0 +1,413 @@
+---
+import Icon from './Icon.astro';
+import SplitHeading from './SplitHeading.astro';
+import { checklists, wa } from '../data/site';
+---
+
+<section class="section docs" id="documents">
+  <div class="wrap">
+    <div class="section-head split">
+      <div>
+        <div class="gate" data-reveal><span>Gate 04</span><span>Before you visit</span></div>
+        <SplitHeading text="Bring the right papers the first time." />
+      </div>
+      <p class="lede" data-reveal style="--d:2">
+        Pick a service and tick off what you already have. It saves you a second trip to the office.
+      </p>
+    </div>
+
+    <div class="docs-grid" data-docs>
+      <div class="docs-tabs" role="tablist" aria-label="Services" data-reveal>
+        {
+          checklists.map((c, i) => (
+            <button
+              role="tab"
+              id={`tab-${c.id}`}
+              aria-controls={`panel-${c.id}`}
+              aria-selected={i === 0 ? 'true' : 'false'}
+              tabindex={i === 0 ? 0 : -1}
+              class="docs-tab"
+              data-tab={c.id}
+            >
+              <span class="mono">{String(i + 1).padStart(2, '0')}</span>
+              <span class="t">{c.title}</span>
+              <Icon name="arrow" size={18} />
+            </button>
+          ))
+        }
+      </div>
+
+      <div class="docs-panels" data-reveal style="--d:2">
+        {
+          checklists.map((c, i) => (
+            <div
+              class="docs-panel"
+              role="tabpanel"
+              id={`panel-${c.id}`}
+              aria-labelledby={`tab-${c.id}`}
+              hidden={i !== 0}
+              data-panel={c.id}
+            >
+              <div class="panel-head">
+                <div>
+                  <span class="mono panel-kicker">Checklist</span>
+                  <h3>{c.title}</h3>
+                </div>
+                <div class="meter" data-meter>
+                  <svg viewBox="0 0 44 44" aria-hidden="true">
+                    <circle cx="22" cy="22" r="19" />
+                    <circle cx="22" cy="22" r="19" class="fill" pathLength="100" />
+                  </svg>
+                  <span>
+                    <b data-count>0</b>/{c.items.length}
+                  </span>
+                </div>
+              </div>
+              <ul class="items">
+                {c.items.map((it, j) => (
+                  <li style={`--j:${j}`}>
+                    <label>
+                      <input type="checkbox" />
+                      <span class="box">
+                        <Icon name="check" size={14} stroke={3} />
+                      </span>
+                      <span class="txt">{it}</span>
+                    </label>
+                  </li>
+                ))}
+              </ul>
+              <div class="panel-foot">
+                <p>Requirements change by country and purpose. We'll confirm the exact list for you.</p>
+                <a class="link-arrow" href={wa(`Hi Fly With Us, which documents do I need for ${c.title}?`)} target="_blank" rel="noopener">
+                  Confirm on WhatsApp <Icon name="arrow" size={16} />
+                </a>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .docs {
+    background: var(--paper);
+  }
+  .docs-grid {
+    display: grid;
+    gap: 1.5rem;
+  }
+  @media (min-width: 960px) {
+    .docs-grid {
+      grid-template-columns: 0.85fr 1.15fr;
+      gap: 3rem;
+      align-items: start;
+    }
+  }
+  .docs-tabs {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    margin-inline: calc(var(--gutter) * -1);
+    padding-inline: var(--gutter);
+    scroll-snap-type: x mandatory;
+  }
+  .docs-tabs::-webkit-scrollbar {
+    display: none;
+  }
+  @media (min-width: 960px) {
+    .docs-tabs {
+      flex-direction: column;
+      gap: 0;
+      overflow: visible;
+      margin: 0;
+      padding: 0;
+      border-top: 1px solid var(--rule);
+    }
+  }
+  .docs-tab {
+    flex: none;
+    scroll-snap-align: start;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.7rem 1rem;
+    border: 1.5px solid var(--rule);
+    border-radius: 999px;
+    background: var(--card);
+    cursor: pointer;
+    text-align: left;
+    color: var(--ink-2);
+    transition:
+      color 0.4s,
+      background 0.4s,
+      padding 0.5s var(--ease-out);
+  }
+  .docs-tab .mono {
+    font-size: 0.7rem;
+    color: var(--ink-3);
+  }
+  .docs-tab .t {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.92rem;
+    white-space: nowrap;
+  }
+  .docs-tab :global(.icon) {
+    display: none;
+  }
+  .docs-tab[aria-selected='true'] {
+    background: var(--navy);
+    border-color: var(--navy);
+    color: #fff;
+  }
+  .docs-tab[aria-selected='true'] .mono {
+    color: var(--signal);
+  }
+  @media (min-width: 960px) {
+    .docs-tab {
+      border: 0;
+      border-bottom: 1px solid var(--rule);
+      border-radius: 0;
+      background: transparent;
+      padding: 1.25rem 0.5rem;
+      position: relative;
+    }
+    .docs-tab .t {
+      font-size: clamp(1.15rem, 1.6vw, 1.45rem);
+      flex: 1;
+    }
+    .docs-tab :global(.icon) {
+      display: block;
+      opacity: 0;
+      transform: translateX(-10px);
+      transition:
+        opacity 0.4s,
+        transform 0.5s var(--ease-out);
+    }
+    .docs-tab:hover {
+      color: var(--navy);
+      padding-left: 1rem;
+    }
+    .docs-tab[aria-selected='true'] {
+      background: transparent;
+      color: var(--navy);
+      padding-left: 1.2rem;
+    }
+    .docs-tab[aria-selected='true'] .mono {
+      color: var(--sky);
+    }
+    .docs-tab[aria-selected='true'] :global(.icon) {
+      opacity: 1;
+      transform: none;
+    }
+    .docs-tab::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 22%;
+      bottom: 22%;
+      width: 3px;
+      border-radius: 2px;
+      background: var(--signal);
+      transform: scaleY(0);
+      transition: transform 0.5s var(--ease-out);
+    }
+    .docs-tab[aria-selected='true']::before {
+      transform: scaleY(1);
+    }
+  }
+
+  .docs-panel {
+    background: var(--card);
+    border: 1px solid var(--rule);
+    border-radius: 20px;
+    padding: clamp(22px, 3.4vw, 40px);
+    box-shadow: 0 30px 60px -40px rgba(11, 31, 126, 0.35);
+    animation: panelIn 0.6s var(--ease-out);
+  }
+  @keyframes panelIn {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+  }
+  .panel-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding-bottom: 1.2rem;
+    border-bottom: 1px dashed var(--rule);
+  }
+  .panel-kicker {
+    font-size: 0.68rem;
+    color: var(--sky);
+  }
+  .panel-head h3 {
+    margin: 0.2rem 0 0;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(1.4rem, 2.4vw, 1.9rem);
+    color: var(--navy);
+    line-height: 1.1;
+  }
+  .meter {
+    position: relative;
+    width: 64px;
+    height: 64px;
+    flex: none;
+    display: grid;
+    place-items: center;
+  }
+  .meter svg {
+    position: absolute;
+    inset: 0;
+    transform: rotate(-90deg);
+  }
+  .meter circle {
+    fill: none;
+    stroke: var(--paper-2);
+    stroke-width: 4;
+  }
+  .meter circle.fill {
+    stroke: var(--wa);
+    stroke-linecap: round;
+    stroke-dasharray: 100;
+    stroke-dashoffset: var(--off, 100);
+    transition: stroke-dashoffset 0.6s var(--ease-out);
+  }
+  .meter span {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--ink-3);
+  }
+  .meter b {
+    color: var(--navy);
+    font-size: 1rem;
+  }
+  .items {
+    list-style: none;
+    padding: 0;
+    margin: 0.6rem 0 0;
+  }
+  .items li {
+    animation: itemIn 0.6s var(--ease-out) backwards;
+    animation-delay: calc(var(--j) * 60ms);
+  }
+  @keyframes itemIn {
+    from {
+      opacity: 0;
+      transform: translateX(-10px);
+    }
+  }
+  .items label {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 0.85rem 0.25rem;
+    border-bottom: 1px solid var(--paper-2);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .items input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .box {
+    flex: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 7px;
+    border: 1.5px solid var(--rule);
+    display: grid;
+    place-items: center;
+    color: #fff;
+    transition:
+      background 0.3s,
+      border-color 0.3s,
+      transform 0.3s var(--ease-out);
+  }
+  .box :global(.icon) {
+    stroke-dasharray: 24;
+    stroke-dashoffset: 24;
+    transition: stroke-dashoffset 0.35s var(--ease-out) 0.05s;
+  }
+  .items input:checked + .box {
+    background: var(--wa);
+    border-color: var(--wa);
+    transform: scale(1.08);
+  }
+  .items input:checked + .box :global(.icon) {
+    stroke-dashoffset: 0;
+  }
+  .items input:focus-visible + .box {
+    outline: 2px solid var(--sky);
+    outline-offset: 2px;
+  }
+  .txt {
+    font-weight: 500;
+    transition: color 0.3s;
+  }
+  .items input:checked ~ .txt {
+    color: var(--ink-3);
+    text-decoration: line-through;
+    text-decoration-color: rgba(31, 168, 85, 0.6);
+  }
+  .panel-foot {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.8rem 1.5rem;
+    margin-top: 1.4rem;
+  }
+  .panel-foot p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--ink-3);
+    max-width: 26rem;
+  }
+</style>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-docs]')!;
+  const tabs = [...root.querySelectorAll<HTMLButtonElement>('[data-tab]')];
+  const panels = [...root.querySelectorAll<HTMLElement>('[data-panel]')];
+
+  const select = (id: string, focus = false) => {
+    tabs.forEach((t) => {
+      const on = t.dataset.tab === id;
+      t.setAttribute('aria-selected', String(on));
+      t.tabIndex = on ? 0 : -1;
+      if (on && focus) t.focus();
+      if (on) t.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
+    });
+    panels.forEach((p) => (p.hidden = p.dataset.panel !== id));
+  };
+  tabs.forEach((t, i) => {
+    t.addEventListener('click', () => select(t.dataset.tab!));
+    t.addEventListener('keydown', (e) => {
+      const k = e.key;
+      if (!['ArrowDown', 'ArrowUp', 'ArrowLeft', 'ArrowRight'].includes(k)) return;
+      e.preventDefault();
+      const d = k === 'ArrowDown' || k === 'ArrowRight' ? 1 : -1;
+      select(tabs[(i + d + tabs.length) % tabs.length].dataset.tab!, true);
+    });
+  });
+
+  panels.forEach((p) => {
+    const boxes = [...p.querySelectorAll<HTMLInputElement>('input[type=checkbox]')];
+    const meter = p.querySelector<HTMLElement>('[data-meter]')!;
+    const count = p.querySelector<HTMLElement>('[data-count]')!;
+    const update = () => {
+      const n = boxes.filter((b) => b.checked).length;
+      count.textContent = String(n);
+      meter.style.setProperty('--off', String(100 - (n / boxes.length) * 100));
+    };
+    boxes.forEach((b) => b.addEventListener('change', update));
+  });
+</script>

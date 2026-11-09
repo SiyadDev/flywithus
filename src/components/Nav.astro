@@ -1,0 +1,301 @@
+---
+import Logo from './Logo.astro';
+import Icon from './Icon.astro';
+import { business, wa } from '../data/site';
+
+const links = [
+  { href: '#services', label: 'Services' },
+  { href: '#book', label: 'Book' },
+  { href: '#documents', label: 'Documents' },
+  { href: '#destinations', label: 'Destinations' },
+  { href: '#faq', label: 'FAQ' },
+  { href: '#visit', label: 'Visit us' },
+];
+---
+
+<header class="nav" data-nav>
+  <div class="nav-inner wrap">
+    <a href="#top" class="nav-logo" aria-label="Fly With Us — home">
+      <Logo size="sm" />
+    </a>
+
+    <nav class="nav-links" aria-label="Main">
+      {links.map((l) => <a href={l.href} data-navlink>{l.label}</a>)}
+    </nav>
+
+    <div class="nav-cta">
+      <a class="nav-phone mono" href={`tel:${business.phones[0].tel}`}>
+        <Icon name="phone" size={16} />
+        {business.phones[0].label}
+      </a>
+      <a class="btn btn-wa nav-wa" href={wa('Hi Fly With Us, I have an enquiry.')} target="_blank" rel="noopener">
+        <Icon name="whatsapp" size={18} /> <span>WhatsApp</span>
+      </a>
+      <button class="nav-burger" aria-label="Open menu" aria-expanded="false" data-burger>
+        <Icon name="menu" size={26} />
+      </button>
+    </div>
+  </div>
+
+  <div class="drawer" data-drawer hidden>
+    <nav aria-label="Mobile">
+      {
+        links.map((l, i) => (
+          <a href={l.href} style={`--i:${i}`} data-drawer-link>
+            <span class="mono">0{i + 1}</span>
+            {l.label}
+          </a>
+        ))
+      }
+    </nav>
+    <div class="drawer-foot">
+      <a href={`tel:${business.phones[0].tel}`} class="btn btn-light"><Icon name="phone" size={18} /> Call us</a>
+      <a href={wa('Hi Fly With Us, I have an enquiry.')} class="btn btn-wa" target="_blank" rel="noopener"><Icon name="whatsapp" size={18} /> WhatsApp</a>
+    </div>
+  </div>
+</header>
+
+<style>
+  .nav {
+    position: fixed;
+    inset: 0 0 auto 0;
+    z-index: 50;
+    color: #fff;
+    transition:
+      background-color 0.4s var(--ease-out),
+      color 0.4s var(--ease-out),
+      box-shadow 0.4s var(--ease-out),
+      transform 0.5s var(--ease-out);
+  }
+  .nav-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    height: 78px;
+  }
+  .nav-logo {
+    text-decoration: none;
+  }
+  .nav :global(.logo-word) {
+    color: #fff;
+    transition: color 0.4s;
+  }
+  .nav :global(.logo-script) {
+    color: #a9c8ef;
+  }
+  .nav.scrolled {
+    background: rgba(246, 244, 239, 0.88);
+    backdrop-filter: saturate(1.4) blur(14px);
+    -webkit-backdrop-filter: saturate(1.4) blur(14px);
+    color: var(--ink);
+    box-shadow: 0 1px 0 var(--rule);
+  }
+  .nav.scrolled :global(.logo-word) {
+    color: var(--navy);
+  }
+  .nav.scrolled :global(.logo-script) {
+    color: var(--steel);
+  }
+  .nav.hide {
+    transform: translateY(-100%);
+  }
+  .nav-links {
+    display: none;
+    gap: 2rem;
+  }
+  .nav-links a {
+    position: relative;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.88rem;
+    text-decoration: none;
+    opacity: 0.85;
+    padding-block: 0.4rem;
+    transition: opacity 0.3s;
+  }
+  .nav-links a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2px;
+    background: var(--signal);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.45s var(--ease-out);
+  }
+  .nav-links a:hover,
+  .nav-links a.active {
+    opacity: 1;
+  }
+  .nav-links a:hover::after,
+  .nav-links a.active::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+  .nav-cta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .nav-phone {
+    display: none;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.8rem;
+    text-decoration: none;
+    letter-spacing: 0.02em;
+  }
+  .nav-wa {
+    padding: 0.7rem 1.05rem;
+    font-size: 0.85rem;
+  }
+  .nav-burger {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    border-radius: 50%;
+    -webkit-tap-highlight-color: transparent;
+  }
+  @media (max-width: 520px) {
+    .nav-wa span {
+      display: none;
+    }
+    .nav-wa {
+      padding: 0.7rem;
+    }
+  }
+  @media (min-width: 1080px) {
+    .nav-links {
+      display: flex;
+    }
+    .nav-burger {
+      display: none;
+    }
+  }
+  @media (min-width: 1240px) {
+    .nav-phone {
+      display: inline-flex;
+    }
+  }
+
+  .drawer {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background: var(--navy-deep);
+    color: #fff;
+    padding: 110px var(--gutter) calc(32px + env(safe-area-inset-bottom));
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    clip-path: circle(0 at calc(100% - 40px) 40px);
+    transition: clip-path 0.7s var(--ease-in-out);
+  }
+  .drawer.open {
+    clip-path: circle(150% at calc(100% - 40px) 40px);
+  }
+  .drawer nav {
+    display: grid;
+  }
+  .drawer nav a {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    padding: 0.7rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(1.8rem, 8vw, 2.6rem);
+    text-decoration: none;
+    opacity: 0;
+    transform: translateY(20px);
+    transition:
+      opacity 0.5s var(--ease-out),
+      transform 0.5s var(--ease-out);
+  }
+  .drawer.open nav a {
+    opacity: 1;
+    transform: none;
+    transition-delay: calc(0.2s + var(--i) * 50ms);
+  }
+  .drawer nav a .mono {
+    font-size: 0.75rem;
+    color: var(--signal);
+  }
+  .drawer-foot {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+  .nav.menu-open {
+    color: #fff;
+    background: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+  }
+  .nav.menu-open :global(.logo-word) {
+    color: #fff;
+  }
+</style>
+
+<script>
+  const nav = document.querySelector<HTMLElement>('[data-nav]')!;
+  const burger = nav.querySelector<HTMLButtonElement>('[data-burger]')!;
+  const drawer = nav.querySelector<HTMLElement>('[data-drawer]')!;
+  let lastY = window.scrollY;
+  let open = false;
+
+  const onScroll = () => {
+    const y = window.scrollY;
+    nav.classList.toggle('scrolled', y > 40);
+    if (!open) nav.classList.toggle('hide', y > 600 && y > lastY + 4);
+    if (y < lastY - 4) nav.classList.remove('hide');
+    lastY = y;
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  const setOpen = (v: boolean) => {
+    open = v;
+    burger.setAttribute('aria-expanded', String(v));
+    burger.setAttribute('aria-label', v ? 'Close menu' : 'Open menu');
+    nav.classList.toggle('menu-open', v);
+    document.body.style.overflow = v ? 'hidden' : '';
+    if (v) {
+      drawer.hidden = false;
+      requestAnimationFrame(() => requestAnimationFrame(() => drawer.classList.add('open')));
+    } else {
+      drawer.classList.remove('open');
+      setTimeout(() => {
+        if (!open) drawer.hidden = true;
+      }, 700);
+    }
+  };
+  burger.addEventListener('click', () => setOpen(!open));
+  drawer.querySelectorAll('[data-drawer-link]').forEach((a) => a.addEventListener('click', () => setOpen(false)));
+  window.addEventListener('keydown', (e) => e.key === 'Escape' && open && setOpen(false));
+
+  // Active section highlight
+  const links = [...nav.querySelectorAll<HTMLAnchorElement>('[data-navlink]')];
+  const io = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((en) => {
+        if (en.isIntersecting) {
+          links.forEach((l) => l.classList.toggle('active', l.hash === `#${en.target.id}`));
+        }
+      });
+    },
+    { rootMargin: '-45% 0px -50% 0px' },
+  );
+  links.forEach((l) => {
+    const t = document.querySelector(l.hash);
+    if (t) io.observe(t);
+  });
+</script>

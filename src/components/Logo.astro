@@ -1,0 +1,78 @@
+---
+interface Props {
+  size?: 'sm' | 'md' | 'lg';
+  tone?: 'navy' | 'light';
+  sub?: boolean;
+}
+const { size = 'sm', tone = 'navy', sub = false } = Astro.props;
+---
+
+<span class={`logo logo-${size} tone-${tone}`}>
+  <span class="logo-script">Travel The World</span>
+  <span class="logo-word">FLY WITH US</span>
+  {sub && <span class="logo-sub"><i></i>Tours &amp; Travels<i></i></span>}
+</span>
+
+<style>
+  .logo {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1;
+    user-select: none;
+  }
+  .logo-script {
+    font-family: var(--font-script);
+    color: var(--steel);
+    font-size: 0.95em;
+    margin-bottom: -0.18em;
+    position: relative;
+    z-index: 1;
+    white-space: nowrap;
+  }
+  .logo-word {
+    font-family: var(--font-display);
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    color: var(--navy);
+    white-space: nowrap;
+  }
+  .logo-sub {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    margin-top: 0.35em;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.34em;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--navy);
+    white-space: nowrap;
+  }
+  .logo-sub i {
+    display: block;
+    width: 2.2em;
+    height: 1px;
+    background: currentColor;
+  }
+  .logo-sm {
+    font-size: 22px;
+  }
+  .logo-sm .logo-script {
+    font-size: 15px;
+  }
+  .logo-md {
+    font-size: 38px;
+  }
+  .logo-lg {
+    font-size: clamp(56px, 12vw, 150px);
+  }
+  .tone-light .logo-word,
+  .tone-light .logo-sub {
+    color: #fff;
+  }
+  .tone-light .logo-script {
+    color: #a9c8ef;
+  }
+</style>

@@ -1,0 +1,21 @@
+---
+interface Props {
+  text: string;
+  as?: 'h2' | 'h3';
+  class?: string;
+}
+const { text, as: Tag = 'h2', class: cls = 'h2' } = Astro.props;
+const words = text.split(' ');
+---
+
+<Tag class={`${cls} split-words`} data-split aria-label={text}>
+  {
+    words.map((w, i) => (
+      <>
+        <span class="w" aria-hidden="true">
+          <span style={`--i:${i}`}>{w}</span>
+        </span>{' '}
+      </>
+    ))
+  }
+</Tag>
