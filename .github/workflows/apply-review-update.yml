@@ -1,0 +1,84 @@
+name: Apply review update
+
+# Runs when someone submits the "Update Google reviews" issue form (or edits it
+# after a mistake). Validates the numbers, updates src/data/reviews.json, pushes
+# to main (Cloudflare redeploys), and reports back as a comment on the issue.
+on:
+  issues:
+    types: [opened, edited]
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: update-reviews
+  cancel-in-progress: false
+
+jobs:
+  apply:
+    # Only form submissions, and only from people with access to the repo.
+    if: >-
+      contains(github.event.issue.labels.*.name, 'review-update') &&
+      github.event.issue.state == 'open' &&
+      contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.issue.author_association)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+
+      - name: Read the form
+        run: node scripts/parse-review-issue.mjs
+
+      - name: Check and write the new numbers
+        id: apply
+        run: |
+          set +e
+          node scripts/apply-review-numbers.mjs > result.txt 2>&1
+          code=$?
+          cat result.txt
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Save to the repository
+        if: steps.apply.outputs.code == '0'
+        run: |
+          if git diff --quiet -- src/data/reviews.json; then
+            echo "No change to save."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          git add src/data/reviews.json
+          git commit -m "Update Google reviews: $COUNT reviews, $RATING★"
+          git push
+
+      - name: Report back
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          NUMBER: ${{ github.event.issue.number }}
+          CODE: ${{ steps.apply.outputs.code }}
+        run: |
+          if [ "$CODE" = "0" ]; then
+            { echo "✅ Done. $(cat result.txt)"; echo; echo "The website will show the new numbers in a couple of minutes."; } > comment.md
+            gh issue close "$NUMBER" -R "$REPO" --comment "$(cat comment.md)"
+            for n in $(gh issue list -R "$REPO" --label review-check --state open --json number --jq '.[].number'); do
+              gh issue close "$n" -R "$REPO" --comment "✅ Updated from #$NUMBER."
+            done
+          else
+            {
+              echo "⚠️ **The website was not changed.** Please check the numbers:"
+              echo
+              sed -n 's/^  - /- /p' result.txt
+              echo
+              echo "To fix it, click **⋯ → Edit** on this issue, correct the numbers and save. It will try again automatically."
+            } > comment.md
+            gh issue comment "$NUMBER" -R "$REPO" --body-file comment.md
+          fi

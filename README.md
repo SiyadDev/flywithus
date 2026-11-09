@@ -25,12 +25,17 @@ The rating, total count, star breakdown and review quotes live in `src/data/revi
 
 1. **Every Monday at 9 am (IST)** GitHub opens a **"Weekly review check"** issue and emails everyone watching the repo.
 2. The issue shows the numbers currently on the site, with a link to the Google reviews.
-3. If Google shows different numbers, use the issue's **Update reviews** link: press **Run workflow**, type the
-   rating, total and the count for each star, and press the green **Run workflow**.
-4. The form checks the numbers add up, saves them, and closes the issue. Cloudflare rebuilds the site within minutes.
+3. If Google shows different numbers, click **update the numbers** in the issue. A form opens **already filled in
+   with the website's current numbers**; change what's different and submit it.
+4. A workflow checks the numbers add up, saves them, closes both issues and comments the result. If something doesn't
+   add up it explains why in a comment; edit the issue to fix it and it retries. Cloudflare rebuilds within minutes.
 
-Nothing changed? Just close the issue. To get reminders, the owner needs a GitHub account added as a collaborator
-(repo **Settings → Collaborators**) and must be watching the repo.
+Nothing changed? Just close the issue. The reminder is **assigned** to the repo owner, which guarantees an email. To
+include the business owner: add their GitHub account as a collaborator (**Settings → Collaborators**), then set the
+repo variable `REVIEW_ASSIGNEES` (**Settings → Secrets and variables → Actions → Variables**) to e.g.
+`SiyadDev,theirlogin`.
+
+Backup: **Actions → Update reviews → Run workflow** does the same job with an empty form.
 
 Review **quotes** are picked by hand; ask the developer to refresh them now and then.
 

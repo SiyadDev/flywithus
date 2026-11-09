@@ -1,12 +1,11 @@
 name: Weekly review check
 
 # Every Monday 9:00 am India time, open a reminder issue asking the owner to
-# check the Google rating and update the site with the "Update reviews" form.
+# check the Google rating. The issue links to a form pre-filled with the
+# website's current numbers (.github/ISSUE_TEMPLATE/update-reviews.yml).
 on:
   schedule:
-    # TEMPORARY TEST (9 Nov 2026): 23:48 IST tonight, plus a 5-minute backup until 01:30 IST.
-    - cron: '18 18 * * 1'
-    - cron: '*/5 18-19 * * 1'
+    - cron: '30 3 * * 1' # 03:30 UTC = 09:00 IST, Mondays
   workflow_dispatch:
 
 permissions:
@@ -26,6 +25,7 @@ jobs:
           ASSIGNEES: ${{ vars.REVIEW_ASSIGNEES || github.repository_owner }}
         run: |
           gh label create review-check --color FFC629 --description "Weekly Google review check" --force -R "$REPO"
+          gh label create review-update --color 1E8FE1 --description "New Google numbers for the website" --force -R "$REPO"
 
           # Don't pile up reminders: if last week's is still open, leave it.
           open=$(gh issue list -R "$REPO" --label review-check --state open --json number --jq 'length')
@@ -42,7 +42,8 @@ jobs:
           b2=$(jq -r .breakdown.two src/data/reviews.json)
           b1=$(jq -r .breakdown.one src/data/reviews.json)
           updated=$(jq -r .updatedAt src/data/reviews.json)
-          form="https://github.com/$REPO/actions/workflows/update-reviews.yml"
+          # Link that opens the update form already filled in with today's numbers.
+          form="https://github.com/$REPO/issues/new?template=update-reviews.yml&rating=$rating&count=$count&five=$b5&four=$b4&three=$b3&two=$b2&one=$b1"
           google="https://www.google.com/search?q=FLY+WITH+US+TOURS+%26+TRAVELS+Mannarkkad+reviews"
 
           cat > body.md <<EOF
@@ -54,8 +55,8 @@ jobs:
           **1. See the latest numbers on Google →** [open our Google reviews]($google)
           Note the rating, the total number of reviews, and how many there are for each star (5★ to 1★).
 
-          **2. If anything changed →** [open the Update reviews form]($form)
-          Press **Run workflow**, type the numbers, then press the green **Run workflow** button.
+          **2. If anything changed →** [**update the numbers**]($form)
+          The form opens already filled in with today's website numbers. Change what's different and press **Create**.
           The website updates itself a couple of minutes later, and this issue closes automatically.
 
           **Nothing changed?** Just close this issue.
