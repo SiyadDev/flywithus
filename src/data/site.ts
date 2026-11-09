@@ -2,6 +2,9 @@
 // Google rating, review count, breakdown and quotes live in reviews.json.
 import reviewData from './reviews.json';
 
+/** Prefix a public file path with the site's base (e.g. /flywithus on GitHub Pages). */
+export const asset = (p: string) => `${import.meta.env.BASE_URL.replace(/\/$/, '')}${p}`;
+
 export const business = {
   name: 'Fly With Us',
   fullName: 'Fly With Us Tours & Travels',
@@ -47,7 +50,7 @@ export const services: Service[] = [
     short: 'Domestic & international',
     body: 'Gulf, holiday or home — we compare fares across airlines and book the route, timing and baggage that suit you.',
     icon: 'plane',
-    image: '/images/flight-ticket.jpg',
+    image: asset('/images/flight-ticket.jpg'),
   },
   {
     id: 'visa',
@@ -55,7 +58,7 @@ export const services: Service[] = [
     short: 'UAE, GCC, Asia & more',
     body: 'Reliable help with tourist and visit visas — forms, documents and follow-up handled for you.',
     icon: 'visa',
-    image: '/images/visa.jpg',
+    image: asset('/images/visa.jpg'),
   },
   {
     id: 'attestation',
@@ -63,7 +66,7 @@ export const services: Service[] = [
     short: 'Certificates, embassy, MEA',
     body: 'Get your documents valid and recognised abroad with trusted stamping and attestation.',
     icon: 'stamp',
-    image: '/images/attestation.jpg',
+    image: asset('/images/attestation.jpg'),
   },
   {
     id: 'passport',
@@ -125,14 +128,14 @@ export type Destination = {
 };
 
 export const destinations: Destination[] = [
-  { city: 'Dubai', country: 'United Arab Emirates', code: 'DXB', image: '/images/dest/dubai.jpg', note: 'Tickets · Visit visa' },
-  { city: 'Riyadh', country: 'Saudi Arabia', code: 'RUH', image: '/images/dest/riyadh.jpg', note: 'Tickets · Attestation' },
-  { city: 'Doha', country: 'Qatar', code: 'DOH', image: '/images/dest/doha.jpg', note: 'Tickets · Visit visa' },
-  { city: 'Muscat', country: 'Oman', code: 'MCT', image: '/images/dest/muscat.jpg', note: 'Tickets · Tourist visa' },
-  { city: 'Kuala Lumpur', country: 'Malaysia', code: 'KUL', image: '/images/dest/kualalumpur.jpg', note: 'Holidays · Tourist visa' },
-  { city: 'Singapore', country: 'Singapore', code: 'SIN', image: '/images/dest/singapore.jpg', note: 'Holidays · Tourist visa' },
-  { city: 'Bangkok', country: 'Thailand', code: 'BKK', image: '/images/dest/bangkok.jpg', note: 'Holidays · Packages' },
-  { city: 'Malé', country: 'Maldives', code: 'MLE', image: '/images/dest/maldives.jpg', note: 'Resorts · Honeymoons' },
+  { city: 'Dubai', country: 'United Arab Emirates', code: 'DXB', image: asset('/images/dest/dubai.jpg'), note: 'Tickets · Visit visa' },
+  { city: 'Riyadh', country: 'Saudi Arabia', code: 'RUH', image: asset('/images/dest/riyadh.jpg'), note: 'Tickets · Attestation' },
+  { city: 'Doha', country: 'Qatar', code: 'DOH', image: asset('/images/dest/doha.jpg'), note: 'Tickets · Visit visa' },
+  { city: 'Muscat', country: 'Oman', code: 'MCT', image: asset('/images/dest/muscat.jpg'), note: 'Tickets · Tourist visa' },
+  { city: 'Kuala Lumpur', country: 'Malaysia', code: 'KUL', image: asset('/images/dest/kualalumpur.jpg'), note: 'Holidays · Tourist visa' },
+  { city: 'Singapore', country: 'Singapore', code: 'SIN', image: asset('/images/dest/singapore.jpg'), note: 'Holidays · Tourist visa' },
+  { city: 'Bangkok', country: 'Thailand', code: 'BKK', image: asset('/images/dest/bangkok.jpg'), note: 'Holidays · Packages' },
+  { city: 'Malé', country: 'Maldives', code: 'MLE', image: asset('/images/dest/maldives.jpg'), note: 'Resorts · Honeymoons' },
 ];
 
 // Draft lists — please review with the team before launch.

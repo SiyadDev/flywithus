@@ -1,6 +1,6 @@
 ---
 import '../styles/global.css';
-import { business } from '../data/site';
+import { business, asset } from '../data/site';
 
 interface Props {
   title?: string;
@@ -45,15 +45,15 @@ const jsonLd = {
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="/images/hero-sky.jpg" />
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta property="og:image" content={new URL(asset('/images/hero-sky.jpg'), Astro.site).href} />
+    <link rel="icon" href={asset('/favicon.svg')} type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&family=Great+Vibes&family=IBM+Plex+Mono:wght@500;600&family=Montserrat:wght@600;700;800;900&display=swap"
       rel="stylesheet"
     />
-    <link rel="preload" as="image" href="/images/hero-sky.jpg" />
+    <link rel="preload" as="image" href={asset('/images/hero-sky.jpg')} />
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
     <script is:inline>document.documentElement.classList.add('js');</script>
   </head>

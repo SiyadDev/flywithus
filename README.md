@@ -42,6 +42,12 @@ current numbers. If you edit `reviews.json` by hand, run `npm run reviews:form` 
 
 Review **quotes** are picked by hand; ask the developer to refresh them now and then.
 
+## Live preview (GitHub Pages)
+
+**https://siyaddev.github.io/flywithus/** — rebuilt automatically on every push to `main` and after every review
+update (`.github/workflows/pages.yml`). The workflow builds with `BASE_PATH=/flywithus`; use `asset('/images/…')`
+for any new image path so it works both here and at a root domain.
+
 ## Deploy (Cloudflare)
 
 In Cloudflare: **Workers & Pages → Create → Pages → Connect to Git** → pick `SiyadDev/flywithus`.

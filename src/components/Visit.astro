@@ -1,7 +1,7 @@
 ---
 import Icon from './Icon.astro';
 import SplitHeading from './SplitHeading.astro';
-import { business, wa } from '../data/site';
+import { business, wa, asset } from '../data/site';
 ---
 
 <section class="section visit" id="visit">
@@ -18,7 +18,7 @@ import { business, wa } from '../data/site';
 
     <div class="visit-grid">
       <figure class="office" data-reveal="clip">
-        <img src="/images/office.webp" alt="Inside the Fly With Us Tours & Travels office in Mannarkkad" loading="lazy" data-parallax-img />
+        <img src={asset('/images/office.webp')} alt="Inside the Fly With Us Tours & Travels office in Mannarkkad" loading="lazy" data-parallax-img />
         <figcaption class="mono">Our office · Mannarkkad</figcaption>
       </figure>
 

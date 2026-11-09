@@ -42,6 +42,7 @@ on:
 permissions:
   contents: write
   issues: write
+  actions: write # to start the GitHub Pages deploy after saving
 
 concurrency:
   group: update-reviews
@@ -73,6 +74,7 @@ jobs:
 
       - name: Save to the repository
         env:
+          GH_TOKEN: ${{ github.token }}
           COUNT: ${{ inputs.count }}
           RATING: ${{ inputs.rating }}
         run: |
@@ -86,6 +88,8 @@ jobs:
           git add src/data/reviews.json .github/ISSUE_TEMPLATE/update-reviews.yml
           git commit -m "Update Google reviews: $COUNT reviews, $RATING★"
           git push
+          # Pushes by GitHub Actions don't trigger other workflows, so start the site deploy directly.
+          gh workflow run pages.yml -R "$GITHUB_REPOSITORY" --ref main
 
       - name: Close the weekly reminder
         env:
