@@ -67,7 +67,10 @@ jobs:
           CODE: ${{ steps.apply.outputs.code }}
         run: |
           if [ "$CODE" = "0" ]; then
-            { echo "✅ Done. $(cat result.txt)"; echo; echo "The website will show the new numbers in a couple of minutes."; } > comment.md
+            {
+              echo "✅ Done. $(cat result.txt)"
+              if grep -q "Updated:" result.txt; then echo; echo "The website will show the new numbers in a couple of minutes."; fi
+            } > comment.md
             gh issue close "$NUMBER" -R "$REPO" --comment "$(cat comment.md)"
             for n in $(gh issue list -R "$REPO" --label review-check --state open --json number --jq '.[].number'); do
               gh issue close "$n" -R "$REPO" --comment "✅ Updated from #$NUMBER."
