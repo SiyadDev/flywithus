@@ -31,6 +31,11 @@ import { business, wa } from '../data/site';
         </div>
         <div class="perf"></div>
         <div class="cc-block">
+          <span class="mono cc-label"><Icon name="clock" size={15} /> Hours</span>
+          <p class="cc-hours">{business.hours}</p>
+        </div>
+        <div class="perf"></div>
+        <div class="cc-block">
           <span class="mono cc-label"><Icon name="phone" size={15} /> Call</span>
           {business.phones.map((p) => <a class="cc-phone" href={`tel:${p.tel}`}>{p.label}</a>)}
         </div>
@@ -123,6 +128,11 @@ import { business, wa } from '../data/site';
     font-family: var(--font-display);
     font-weight: 800;
     font-size: 1.25rem;
+    color: var(--navy) !important;
+  }
+  .cc-hours {
+    font-family: var(--font-display);
+    font-weight: 700;
     color: var(--navy) !important;
   }
   .cc-block .link-arrow {

@@ -15,6 +15,7 @@ export const business = {
   email: 'flywithusmkd@gmail.com',
   instagram: 'https://www.instagram.com/fly_withus__/',
   instagramHandle: '@fly_withus__',
+  hours: 'Open every day · 10 am – 8 pm',
   rating: 4.9,
   reviewCount: 121,
   reviewsUrl:
@@ -244,9 +245,22 @@ export const faqs = [
   },
 ];
 
-// Paste real Google reviews here (copy exactly, with the reviewer's first name).
-// The reviews carousel appears automatically once this list has entries.
-export const reviews: { name: string; text: string; when?: string }[] = [];
+// Real 5-star Google reviews, newest first (collected 9 Nov 2026 from the Google listing).
+// Dates are approximate, converted from Google's "x months ago".
+export const reviews: { name: string; text: string; when?: string; tag?: string }[] = [
+  { name: 'Mubeer M.', when: 'Aug 2026', tag: 'Travel service', text: 'It’s a really good travel service. All the staff are very professional, and they get everything done quickly.' },
+  { name: 'Seyd N.', when: 'Aug 2026', tag: 'Tickets', text: 'Affordable price and fast service. Good experience 👌' },
+  { name: 'Rishook K.', when: 'May 2026', tag: 'Journey', text: 'Excellent services and highly recommendable. The hospitality they provide is next level. Are you looking for a budget friendly, and memorable journey Go ahead with fly with us' },
+  { name: 'Abhijith S.', when: 'Mar 2026', tag: 'Service', text: 'Very well organised service and highly appreciable customer relation.' },
+  { name: 'Angel M.', when: 'Feb 2026', tag: 'Trip', text: 'Excellent service and great attention to detail. The team was very helpful, well-organized, and responsive. Our trip went smoothly thanks to them. Highly recommend!' },
+  { name: 'Alisha B.', when: 'Feb 2026', tag: 'Tickets', text: 'Had a great experience of booking tickets with ‘fly with us’. Staffs there are so cooperative and updates were all provided on time that made booking so easier...' },
+  { name: 'Sreelakshmi C.', when: 'Feb 2026', tag: 'Booking', text: 'Great experience with Fly With Us. They handled everything quickly and with clear communication.' },
+  { name: 'Fathima T.', when: 'Feb 2026', tag: 'Visa & tickets', text: 'Such a wonderful experience!! i travelled few months ago very nice visa clearance and tickets everything perfect🤩' },
+  { name: 'Sadik H.', when: 'Feb 2026', tag: 'Booking', text: 'Had a wonderful experience with fly with us tours and travels team. I contacted them for a booking few weeks ago. Staffs were so helpful and cooperate with my queries.' },
+  { name: 'Fazin T.', when: 'Feb 2026', tag: 'Tours', text: 'A trustworthy travel agency that delivers quality service and well-managed tours' },
+];
+
+export const ratingBreakdown = { five: 116, four: 4, three: 0, two: 0, one: 1 };
 
 export const photoCredits = [
   { what: 'Sky', who: 'Harry Knight (CC0)', url: 'https://commons.wikimedia.org/wiki/File:In_flight_above_scattered_clouds_(Unsplash).jpg' },
