@@ -1,8 +1,9 @@
 name: Weekly review check
 
 # Every Monday 9:00 am India time, open a reminder issue asking the owner to
-# check the Google rating. The issue links to a form pre-filled with the
-# website's current numbers (.github/ISSUE_TEMPLATE/update-reviews.yml).
+# check the Google rating. The issue lists the website's current numbers and links
+# to the update form (.github/ISSUE_TEMPLATE/update-reviews.yml), where empty boxes
+# keep the current values.
 # If last week's reminder is still open, it posts a nudge comment on it instead.
 on:
   schedule:
@@ -36,8 +37,8 @@ jobs:
           b2=$(jq -r .breakdown.two src/data/reviews.json)
           b1=$(jq -r .breakdown.one src/data/reviews.json)
           updated=$(jq -r .updatedAt src/data/reviews.json)
-          # Link that opens the update form already filled in with today's numbers.
-          form="https://github.com/$REPO/issues/new?template=update-reviews.yml&rating=$rating&count=$count&five=$b5&four=$b4&three=$b3&two=$b2&one=$b1"
+          # Update form. (Not pre-filled via the link: GitHub keeps re-filling link values, so they can't be edited.)
+          form="https://github.com/$REPO/issues/new?template=update-reviews.yml"
           google="https://www.google.com/search?q=FLY+WITH+US+TOURS+%26+TRAVELS+Mannarkkad+reviews"
 
           # Forgot last week? Don't open a second issue; comment on the open one instead.
@@ -50,7 +51,7 @@ jobs:
           **On the website now:** **$rating★** from **$count reviews** · 5★ $b5 · 4★ $b4 · 3★ $b3 · 2★ $b2 · 1★ $b1
 
           1. [Check our Google reviews]($google)
-          2. If anything changed → [**update the numbers**]($form) (pre-filled with the numbers above)
+          2. If anything changed → [**update the numbers**]($form). Type only what changed; empty boxes keep the numbers above.
 
           Nothing changed? Just close this issue.
           EOF
@@ -69,7 +70,7 @@ jobs:
           Note the rating, the total number of reviews, and how many there are for each star (5★ to 1★).
 
           **2. If anything changed →** [**update the numbers**]($form)
-          The form opens already filled in with today's website numbers. Change what's different and press **Create**.
+          Type **only the numbers that changed** and leave the other boxes empty (empty = keep the number above), then submit.
           The website updates itself a couple of minutes later, and this issue closes automatically.
 
           **Nothing changed?** Just close this issue.

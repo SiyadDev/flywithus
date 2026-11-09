@@ -1,60 +1,48 @@
 name: Update Google reviews
-description: Type the latest numbers from Google. The website updates itself.
+description: Type the numbers that changed on Google. The website updates itself.
 title: Update Google reviews
 labels: [review-update]
 body:
   - type: markdown
     attributes:
       value: |
-        Copy these from our **[Google reviews](https://www.google.com/search?q=FLY+WITH+US+TOURS+%26+TRAVELS+Mannarkkad+reviews)** page.
-        If you opened this from the weekly reminder, the boxes already show the numbers on the website now, so just change what's different.
+        Compare our **[Google reviews](https://www.google.com/search?q=FLY+WITH+US+TOURS+%26+TRAVELS+Mannarkkad+reviews)** with the website's numbers (listed in the weekly reminder).
+
+        **Only fill in the numbers that changed. Leave a box empty to keep the website's current number.**
+        Example: 2 new five-star reviews → type the new **total** and the new **5★** count, leave the rest empty.
   - type: input
     id: rating
     attributes:
       label: Google rating
-      description: The big number next to the stars, e.g. 4.9
-      placeholder: '4.9'
-    validations:
-      required: true
+      description: The number next to the stars, e.g. 4.9
+      placeholder: Leave empty = no change
   - type: input
     id: count
     attributes:
       label: Total number of reviews
-      placeholder: '121'
-    validations:
-      required: true
+      placeholder: Leave empty = no change
   - type: input
     id: five
     attributes:
       label: 5★ reviews
-      placeholder: '116'
-    validations:
-      required: true
+      placeholder: Leave empty = no change
   - type: input
     id: four
     attributes:
       label: 4★ reviews
-      placeholder: '0'
-    validations:
-      required: true
+      placeholder: Leave empty = no change
   - type: input
     id: three
     attributes:
       label: 3★ reviews
-      placeholder: '0'
-    validations:
-      required: true
+      placeholder: Leave empty = no change
   - type: input
     id: two
     attributes:
       label: 2★ reviews
-      placeholder: '0'
-    validations:
-      required: true
+      placeholder: Leave empty = no change
   - type: input
     id: one
     attributes:
       label: 1★ reviews
-      placeholder: '0'
-    validations:
-      required: true
+      placeholder: Leave empty = no change

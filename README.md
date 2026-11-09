@@ -25,8 +25,8 @@ The rating, total count, star breakdown and review quotes live in `src/data/revi
 
 1. **Every Monday at 9 am (IST)** GitHub opens a **"Weekly review check"** issue and emails everyone watching the repo.
 2. The issue shows the numbers currently on the site, with a link to the Google reviews.
-3. If Google shows different numbers, click **update the numbers** in the issue. A form opens **already filled in
-   with the website's current numbers**; change what's different and submit it.
+3. If Google shows different numbers, click **update the numbers** in the issue and type **only the numbers that
+   changed**. Empty boxes keep the website's current numbers (listed in the issue).
 4. A workflow checks the numbers add up, saves them, closes both issues and comments the result. If something doesn't
    add up it explains why in a comment; edit the issue to fix it and it retries. Cloudflare rebuilds within minutes.
 
