@@ -1,0 +1,63 @@
+name: Weekly review check
+
+# Every Monday 9:00 am India time, open a reminder issue asking the owner to
+# check the Google rating and update the site with the "Update reviews" form.
+on:
+  schedule:
+    - cron: '30 3 * * 1' # 03:30 UTC = 09:00 IST, Mondays
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  remind:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Open the reminder issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          gh label create review-check --color FFC629 --description "Weekly Google review check" --force -R "$REPO"
+
+          # Don't pile up reminders: if last week's is still open, leave it.
+          open=$(gh issue list -R "$REPO" --label review-check --state open --json number --jq 'length')
+          if [ "$open" -gt 0 ]; then
+            echo "A review-check issue is already open; not creating another."
+            exit 0
+          fi
+
+          rating=$(jq -r .rating src/data/reviews.json)
+          count=$(jq -r .count src/data/reviews.json)
+          b5=$(jq -r .breakdown.five src/data/reviews.json)
+          b4=$(jq -r .breakdown.four src/data/reviews.json)
+          b3=$(jq -r .breakdown.three src/data/reviews.json)
+          b2=$(jq -r .breakdown.two src/data/reviews.json)
+          b1=$(jq -r .breakdown.one src/data/reviews.json)
+          updated=$(jq -r .updatedAt src/data/reviews.json)
+          form="https://github.com/$REPO/actions/workflows/update-reviews.yml"
+          google="https://www.google.com/search?q=FLY+WITH+US+TOURS+%26+TRAVELS+Mannarkkad+reviews"
+
+          cat > body.md <<EOF
+          ### 2-minute check ⭐
+
+          **On the website now** (last updated $updated):
+          **$rating★** from **$count reviews** · 5★ $b5 · 4★ $b4 · 3★ $b3 · 2★ $b2 · 1★ $b1
+
+          **1. See the latest numbers on Google →** [open our Google reviews]($google)
+          Note the rating, the total number of reviews, and how many there are for each star (5★ to 1★).
+
+          **2. If anything changed →** [open the Update reviews form]($form)
+          Press **Run workflow**, type the numbers, then press the green **Run workflow** button.
+          The website updates itself a couple of minutes later, and this issue closes automatically.
+
+          **Nothing changed?** Just close this issue.
+
+          _Want fresh review quotes on the site? Ask your developer. The quotes are picked by hand._
+          EOF
+
+          gh issue create -R "$REPO" --title "Weekly review check · $(date -u +%d\ %b\ %Y)" --label review-check --body-file body.md
