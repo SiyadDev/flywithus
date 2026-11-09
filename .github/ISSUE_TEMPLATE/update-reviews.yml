@@ -8,13 +8,13 @@ body:
     attributes:
       value: |
         ### On the website now
-        **4.9★** from **121 reviews** · 5★ 116 · 4★ 4 · 3★ 0 · 2★ 0 · 1★ 1
+        **4.9★** from **122 reviews** · 5★ 117 · 4★ 4 · 3★ 0 · 2★ 0 · 1★ 1
         <sub>Last updated 2026-11-09</sub>
 
         Compare with our **[Google reviews](https://www.google.com/search?q=FLY+WITH+US+TOURS+%26+TRAVELS+Mannarkkad+reviews)**.
 
         **Only fill in the numbers that changed. Leave a box empty to keep the website's current number.**
-        Example: 2 new five-star reviews → total **123**, 5★ **118**, leave the rest empty.
+        Example: 2 new five-star reviews → total **124**, 5★ **119**, leave the rest empty.
   - type: input
     id: rating
     attributes:
@@ -25,13 +25,13 @@ body:
     id: count
     attributes:
       label: Total number of reviews
-      description: 'Website now: 121'
+      description: 'Website now: 122'
       placeholder: Leave empty = no change
   - type: input
     id: five
     attributes:
       label: 5★ reviews
-      description: 'Website now: 116'
+      description: 'Website now: 117'
       placeholder: Leave empty = no change
   - type: input
     id: four
