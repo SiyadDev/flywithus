@@ -53,9 +53,10 @@ jobs:
             echo "No change to save."
             exit 0
           fi
+          node scripts/render-review-form.mjs   # keep the form's "Website now" numbers in sync
           git config user.name "github-actions[bot]"
           git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
-          git add src/data/reviews.json
+          git add src/data/reviews.json .github/ISSUE_TEMPLATE/update-reviews.yml
           git commit -m "Update Google reviews: $COUNT reviews, $RATING★"
           git push
 

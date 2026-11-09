@@ -37,6 +37,9 @@ repo variable `REVIEW_ASSIGNEES` (**Settings → Secrets and variables → Actio
 
 Backup: **Actions → Update reviews → Run workflow** does the same job with an empty form.
 
+The form (`.github/ISSUE_TEMPLATE/update-reviews.yml`) is generated from `reviews.json` so it shows the website's
+current numbers. If you edit `reviews.json` by hand, run `npm run reviews:form` (the Monday reminder also re-syncs it).
+
 Review **quotes** are picked by hand; ask the developer to refresh them now and then.
 
 ## Deploy (Cloudflare)

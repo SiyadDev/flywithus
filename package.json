@@ -10,7 +10,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "reviews:form": "node scripts/render-review-form.mjs"
   },
   "dependencies": {
     "astro": "^6.4.8"
