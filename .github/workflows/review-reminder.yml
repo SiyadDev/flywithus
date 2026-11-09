@@ -4,7 +4,9 @@ name: Weekly review check
 # check the Google rating and update the site with the "Update reviews" form.
 on:
   schedule:
-    - cron: '30 3 * * 1' # 03:30 UTC = 09:00 IST, Mondays
+    # TEMPORARY TEST (9 Nov 2026): 23:48 IST tonight, plus a 5-minute backup until 01:30 IST.
+    - cron: '18 18 * * 1'
+    - cron: '*/5 18-19 * * 1'
   workflow_dispatch:
 
 permissions:
