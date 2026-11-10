@@ -1,20 +1,13 @@
 ---
 import Icon from './Icon.astro';
 import { Picture } from 'astro:assets';
-import { business, wa, services, reviews } from '../data/site';
+import { business, wa, services } from '../data/site';
 import heroSky from '../assets/images/hero-sky.jpg';
 import { heroWidths } from '../data/images';
 
 const word = 'FLY WITH US'.split('');
 const ticker = services.map((s) => s.title.toUpperCase());
 
-// Short opening lines from real Google reviews, for the rotating quote.
-const snippets = reviews
-  .map((r) => ({ t: r.text.split(/(?<=[.!])\s/)[0].replace(/[.!…\s]+$/u, ''), n: r.name }))
-  .filter((q) => q.t.length >= 18 && q.t.length <= 70)
-  .slice(0, 5);
-const initials = (n: string) => n.replace(/\./g, '').split(/\s+/).map((p) => p[0]).join('').slice(0, 2).toUpperCase();
-const faces = reviews.slice(0, 4).map((r) => initials(r.name));
 const lastStar = Math.round((business.rating - Math.floor(business.rating)) * 100) || 100;
 ---
 
@@ -67,42 +60,24 @@ const lastStar = Math.round((business.rating - Math.floor(business.rating)) * 10
         <a class="btn btn-light" href="#book">
           Plan my trip <Icon name="arrow" size={18} class="icon-arrow" />
         </a>
-        <a class="btn btn-ghost" href={wa('Hi Fly With Us, I would like to book a flight.')} target="_blank" rel="noopener">
+        <a class="btn btn-ghost hero-wa" href={wa('Hi Fly With Us, I would like to book a flight.')} target="_blank" rel="noopener">
           <Icon name="whatsapp" size={18} /> Chat on WhatsApp
         </a>
       </div>
 
-      <!-- Google rating, shown on every screen size -->
-      <a class="trust hero-fade" style="--d:10" href="#reviews" data-trust
+      <!-- Social proof as one quiet line, right where people decide -->
+      <a class="trust hero-fade" style="--d:10" href="#reviews"
         aria-label={`Rated ${business.rating} out of 5 from ${business.reviewCount} Google reviews. Read the reviews.`}>
-        <span class="trust-faces" aria-hidden="true">
-          {faces.map((f, i) => <span class="face" style={`--k:${i}`}>{f}</span>)}
-          <span class="face face-more">+{business.reviewCount - faces.length}</span>
+        <span class="trust-stars" aria-hidden="true">
+          {[0, 1, 2, 3, 4].map((i) => (
+            <span class="tstar" style={`--i:${i}; --fill:${i === 4 ? lastStar : 100}%`}>
+              <Icon name="star" size={15} />
+              <span class="tstar-on"><Icon name="star" size={15} /></span>
+            </span>
+          ))}
         </span>
-        <span class="trust-score" aria-hidden="true">
-          <span class="trust-stars">
-            {[0, 1, 2, 3, 4].map((i) => (
-              <span class="tstar" style={`--i:${i}; --fill:${i === 4 ? lastStar : 100}%`}>
-                <Icon name="star" size={18} />
-                <span class="tstar-on"><Icon name="star" size={18} /></span>
-              </span>
-            ))}
-          </span>
-          <span class="trust-line">
-            <b data-trust-count={business.rating}>{business.rating}</b>
-            <span>from {business.reviewCount} Google reviews</span>
-          </span>
-        </span>
-        {snippets.length > 0 && (
-          <span class="trust-quote" aria-hidden="true">
-            {snippets.map((q, i) => (
-              <span class={`tq ${i === 0 ? 'on' : ''}`} data-tq>
-                “{q.t}” <em>{q.n}</em>
-              </span>
-            ))}
-          </span>
-        )}
-        <span class="trust-go" aria-hidden="true"><Icon name="arrow" size={16} /></span>
+        <span class="trust-text" aria-hidden="true"><b>{business.rating}</b> · {business.reviewCount} Google reviews</span>
+        <span class="trust-go" aria-hidden="true"><Icon name="arrow" size={14} /></span>
       </a>
     </div>
 
@@ -127,14 +102,7 @@ const lastStar = Math.round((business.rating - Math.floor(business.rating)) * 10
         </div>
       </div>
       <div class="perf"></div>
-      <div class="pass-meta">
-        <div><span class="mono label">Passenger</span><span>You</span></div>
-        <div><span class="mono label">Desk</span><span>Open 7 days</span></div>
-        <div>
-          <span class="mono label">Hours</span>
-          <span class="stars"><Icon name="clock" size={13} /> 10 am – 8 pm, every day</span>
-        </div>
-      </div>
+      <p class="pass-hours"><Icon name="clock" size={14} /> Open every day · 10 am – 8 pm</p>
       <div class="pass-barcode" aria-hidden="true"></div>
     </aside>
     </div>
@@ -346,8 +314,7 @@ const lastStar = Math.round((business.rating - Math.floor(business.rating)) * 10
       transform: none;
       animation: none;
     }
-    .js .hero-fade,
-    .js .face {
+    .js .hero-fade {
       transform: none;
       animation: fadeOnly 0.25s ease forwards;
       animation-delay: 0s;
@@ -359,90 +326,18 @@ const lastStar = Math.round((business.rating - Math.floor(business.rating)) * 10
     .ticker-track {
       animation: none;
     }
-    .tq {
-      transform: none !important;
-    }
   }
 
-  /* ── Google rating strip ── */
+  /* ── Rating line ── */
   .trust {
-    position: relative;
-    display: inline-grid;
-    grid-template-columns: auto auto;
+    display: inline-flex;
     align-items: center;
-    gap: 14px 18px;
-    margin-top: 2rem;
-    padding: 14px 52px 14px 16px;
-    max-width: 100%;
-    border-radius: 18px;
-    background: rgba(4, 10, 46, 0.55);
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    color: #fff;
+    gap: 10px;
+    margin-top: 1.4rem;
+    padding: 6px 0;
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 0.92rem;
     text-decoration: none;
-    transition:
-      border-color 0.4s var(--ease-out),
-      background 0.4s var(--ease-out),
-      transform 0.4s var(--ease-out);
-  }
-  @media (min-width: 760px) {
-    .trust {
-      grid-template-columns: auto auto minmax(0, 1fr);
-      border-radius: 999px;
-      padding-left: 12px;
-    }
-  }
-  @media (hover: hover) {
-    .trust:hover {
-      border-color: rgba(255, 198, 41, 0.6);
-      background: rgba(4, 10, 46, 0.75);
-      transform: translateY(-2px);
-    }
-    .trust:hover .trust-go {
-      transform: translateX(4px);
-      background: var(--signal);
-      color: var(--night);
-    }
-  }
-  .trust-faces {
-    display: flex;
-  }
-  .face {
-    display: grid;
-    place-items: center;
-    width: 34px;
-    height: 34px;
-    margin-left: -9px;
-    border-radius: 50%;
-    border: 2px solid var(--navy-deep);
-    font-family: var(--font-display);
-    font-weight: 800;
-    font-size: var(--label);
-    color: #fff;
-    background: var(--navy);
-  }
-  .face:first-child {
-    margin-left: 0;
-  }
-  .face:nth-child(2) { background: var(--sky-text); }
-  .face:nth-child(3) { background: var(--steel-deep); }
-  .face:nth-child(4) { background: var(--navy-2); }
-  .face-more {
-    background: var(--signal) !important;
-    color: var(--night);
-    font-size: var(--label);
-  }
-  .js .face {
-    opacity: 0;
-    transform: translateX(-8px) scale(0.8);
-    animation: faceIn 0.6s var(--ease-out) forwards;
-    animation-delay: calc(1500ms + var(--k, 4) * 90ms);
-  }
-  @keyframes faceIn {
-    to { opacity: 1; transform: none; }
-  }
-  .trust-score {
-    display: grid;
-    gap: 2px;
   }
   .trust-stars {
     display: flex;
@@ -451,7 +346,7 @@ const lastStar = Math.round((business.rating - Math.floor(business.rating)) * 10
   .tstar {
     position: relative;
     display: inline-flex;
-    color: rgba(255, 255, 255, 0.22);
+    color: rgba(255, 255, 255, 0.25);
   }
   .tstar-on {
     position: absolute;
@@ -460,105 +355,50 @@ const lastStar = Math.round((business.rating - Math.floor(business.rating)) * 10
     color: var(--signal);
     clip-path: inset(0 calc(100% - var(--fill)) 0 0);
   }
-  .js .tstar-on {
-    clip-path: inset(0 100% 0 0);
-    animation: starFill 0.5s var(--ease-out) forwards;
-    animation-delay: calc(1700ms + var(--i) * 120ms);
-  }
-  @keyframes starFill {
-    to { clip-path: inset(0 calc(100% - var(--fill)) 0 0); }
-  }
-  .trust-line {
-    display: flex;
-    align-items: baseline;
-    gap: 8px;
-    font-size: 0.86rem;
-    color: rgba(255, 255, 255, 0.78);
-    white-space: nowrap;
-  }
-  .trust-line b {
+  .trust-text b {
     font-family: var(--font-display);
-    font-weight: 900;
-    font-size: 1.45rem;
-    line-height: 1;
+    font-weight: 800;
     color: #fff;
-    letter-spacing: -0.02em;
-  }
-  .trust-quote {
-    grid-column: 1 / -1;
-    position: relative;
-    display: grid;
-    min-width: 0;
-    padding-top: 12px;
-    border-top: 1px dashed rgba(255, 255, 255, 0.18);
-    font-size: 0.9rem;
-    color: rgba(255, 255, 255, 0.88);
-  }
-  @media (min-width: 760px) {
-    .trust-quote {
-      grid-column: auto;
-      padding: 0 0 0 18px;
-      border-top: 0;
-      border-left: 1px dashed rgba(255, 255, 255, 0.22);
-      max-width: 23rem;
-    }
-  }
-  .tq {
-    grid-area: 1 / 1;
-    opacity: 0;
-    transform: translateY(8px);
-    transition:
-      opacity 0.6s var(--ease-out),
-      transform 0.6s var(--ease-out);
-    line-height: 1.4;
-  }
-  .tq.on {
-    opacity: 1;
-    transform: none;
-  }
-  .tq.out {
-    opacity: 0;
-    transform: translateY(-8px);
-  }
-  .tq em {
-    display: block;
-    font-style: normal;
-    font-family: var(--font-mono);
-    font-size: var(--label);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--on-navy-soft);
-    margin-top: 3px;
   }
   .trust-go {
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    width: 30px;
-    height: 30px;
-    margin-top: -15px;
-    display: grid;
-    place-items: center;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.1);
+    display: inline-flex;
+    opacity: 0.6;
     transition:
-      transform 0.4s var(--ease-out),
-      background 0.4s,
-      color 0.4s;
+      transform 0.2s var(--ease-out),
+      opacity 0.2s;
   }
-  @media (max-width: 759px) {
-    .trust {
-      display: grid;
-      padding-right: 16px;
+  @media (hover: hover) {
+    .trust:hover {
+      color: #fff;
     }
-    .trust-go {
+    .trust:hover .trust-go {
+      opacity: 1;
+      transform: translateX(3px);
+    }
+  }
+
+  /* ── Phones: one clear action, WhatsApp as a light secondary, no decorative tag ── */
+  @media (max-width: 759px) {
+    .hero .gate {
       display: none;
     }
-    .trust-line {
-      flex-wrap: wrap;
-      white-space: normal;
-      column-gap: 6px;
-      row-gap: 0;
+    .hero-lede {
+      margin: 1.4rem 0 1.6rem;
+    }
+    .hero-actions {
+      align-items: center;
+      gap: 0.4rem 1.2rem;
+    }
+    .hero-wa {
+      --bg: transparent;
+      box-shadow: none;
+      padding-inline: 0.2rem;
+    }
+    .hero-wa::after {
+      display: none;
+    }
+    .trust {
+      margin-top: 1.1rem;
     }
   }
 
@@ -643,27 +483,18 @@ const lastStar = Math.round((business.rating - Math.floor(business.rating)) * 10
     padding: 0 10px;
     position: relative;
   }
-  .pass-meta {
-    display: grid;
-    grid-template-columns: 1fr 1.3fr;
-    gap: 12px 18px;
-    padding: 16px 0 14px;
+  .pass-hours {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    padding: 14px 0;
     font-size: 0.85rem;
     font-weight: 600;
+    color: var(--ink-2);
   }
-  .pass-meta > div {
-    display: grid;
-  }
-  .pass-meta > div:last-child {
-    grid-column: 1 / -1;
-  }
-  .stars {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .stars :global(.icon) {
-    color: var(--star);
+  .pass-hours :global(.icon) {
+    color: var(--sky-text);
   }
   .pass-barcode {
     height: 38px;
@@ -842,48 +673,5 @@ const lastStar = Math.round((business.rating - Math.floor(business.rating)) * 10
       tilt.style.transform = `perspective(900px) rotateY(${x * 10}deg) rotateX(${-y * 10}deg)`;
     });
     tilt.addEventListener('pointerleave', () => (tilt.style.transform = ''));
-  }
-  // Rating strip: count up the score and rotate review quotes.
-  const trust = document.querySelector<HTMLElement>('[data-trust]');
-  if (trust) {
-    const num = trust.querySelector<HTMLElement>('[data-trust-count]');
-    if (num && !reduce) {
-      const to = Number(num.dataset.trustCount);
-      num.textContent = '0.0';
-      setTimeout(() => {
-        const t0 = performance.now();
-        const step = (now: number) => {
-          const t = Math.min(1, (now - t0) / 1300);
-          num.textContent = (to * (1 - Math.pow(1 - t, 4))).toFixed(1);
-          if (t < 1) requestAnimationFrame(step);
-        };
-        requestAnimationFrame(step);
-      }, 1600);
-    }
-    const quotes = [...trust.querySelectorAll<HTMLElement>('[data-tq]')];
-    if (quotes.length > 1 && !reduce) {
-      let q = 0;
-      let held = false; // hover or keyboard focus holds the current quote
-      trust.addEventListener('pointerenter', () => (held = true));
-      trust.addEventListener('pointerleave', () => (held = false));
-      trust.addEventListener('focusin', () => (held = true));
-      trust.addEventListener('focusout', () => (held = false));
-      let timer: number | undefined;
-      whileVisible(
-        trust,
-        () => {
-          timer = window.setInterval(() => {
-            if (held || motionPaused()) return;
-            const cur = quotes[q];
-            q = (q + 1) % quotes.length;
-            cur.classList.remove('on');
-            cur.classList.add('out');
-            setTimeout(() => cur.classList.remove('out'), 600);
-            quotes[q].classList.add('on');
-          }, 4200);
-        },
-        () => clearInterval(timer),
-      );
-    }
   }
 </script>
