@@ -1,0 +1,337 @@
+---
+// A side-on plane that lands at each section's Gate label and takes off again.
+//
+// - Every `.gate` label gets a short runway beside it (added at runtime; it's decoration).
+// - Scrolling down: as a gate rises into view the plane glides in from the left, flares,
+//   touches down main gear first, lowers its nose and rolls to a stop. As the gate nears
+//   the top it accelerates, rotates about its main wheels, lifts off, retracts its gear and
+//   climbs away to the right. Scrolling up plays the same thing mirrored, right to left.
+//   That's on phones; on screens 768px and wider the directions swap (scrolling down
+//   arrives from the right, scrolling up from the left).
+// - Each landing and take-off is a short, pre-shaped flight (not tied 1:1 to the scroll
+//   wheel), so it always moves like an aircraft. If the gate is off screen, or motion is
+//   paused or reduced, the plane simply appears parked or disappears.
+---
+
+<template id="gate-runway">
+  <span class="rw" aria-hidden="true">
+    <span class="rw-puff"></span>
+    <svg class="rw-plane" viewBox="0 0 48 18" width="48" height="18">
+      <g class="rw-gear">
+        <path d="M23.6 11.4v3M41 11.2v3.4" stroke="currentColor" stroke-width="1.1"></path>
+        <circle cx="23.6" cy="15.5" r="1.25"></circle>
+        <circle cx="41" cy="15.75" r="1"></circle>
+      </g>
+      <!-- fuselage with window and cockpit cut-outs -->
+      <path
+        fill-rule="evenodd"
+        d="M2.6 7.4C3 6.9 4.6 6.8 6.5 6.8h32.1c4.4 0 8.2 1.6 8.2 3.1 0 1-1.5 1.5-3.6 1.5H14.5C9.5 11.4 5 9.8 2.6 7.4ZM13.0 8.3h1.1v1.1h-1.1ZM15.4 8.3h1.1v1.1h-1.1ZM17.8 8.3h1.1v1.1h-1.1ZM20.2 8.3h1.1v1.1h-1.1ZM22.6 8.3h1.1v1.1h-1.1ZM25.0 8.3h1.1v1.1h-1.1ZM27.4 8.3h1.1v1.1h-1.1ZM29.8 8.3h1.1v1.1h-1.1ZM32.2 8.3h1.1v1.1h-1.1ZM34.6 8.3h1.1v1.1h-1.1ZM37.0 8.3h1.1v1.1h-1.1ZM41.4 7.9h2.6l1.7 1.3h-4.3Z"
+      ></path>
+      <!-- tail fin, tailplane, wing, engine -->
+      <path d="M4 7 1.6.8h3.2l7.4 6Z"></path>
+      <path d="M6.4 8.6 1.4 9.9l.5.6 7.6-.6Z"></path>
+      <path d="M20.6 10.6h8.2l-6.4 4h-2.6Z"></path>
+      <rect x="24.8" y="11.1" width="5.8" height="2.3" rx="1.15"></rect>
+    </svg>
+  </span>
+</template>
+
+<style is:global>
+  .gate-row {
+    display: flex;
+    align-items: stretch;
+    margin-bottom: 1.4rem;
+  }
+  .gate-row > .gate {
+    flex: none;
+    margin-bottom: 0;
+    position: relative;
+    z-index: 1; /* the label is the terminal: the plane passes behind it */
+  }
+  .rw {
+    position: relative;
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: 300px;
+    margin-left: 14px;
+    color: var(--navy);
+    pointer-events: none;
+  }
+  .gate-row.on-dark .rw {
+    color: #fff;
+  }
+  .rw.off {
+    visibility: hidden;
+  }
+  /* runway: a dashed centreline with threshold ticks at both ends */
+  .rw::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2px;
+    background: repeating-linear-gradient(90deg, currentColor 0 9px, transparent 9px 16px);
+    opacity: 0.22;
+  }
+  .rw::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 7px;
+    border-inline: 2px solid currentColor;
+    opacity: 0.22;
+  }
+  .rw-plane {
+    position: absolute;
+    left: 0;
+    bottom: -1.25px; /* wheels sit on the line */
+    margin-left: -23.6px; /* x refers to the main wheels */
+    fill: currentColor;
+    overflow: visible;
+    opacity: 0;
+    transform-origin: 23.6px 16.75px; /* rotate about the main wheels, like a real rotation */
+    will-change: transform, opacity;
+  }
+  .rw-gear {
+    transform-origin: 0 11.4px;
+    transform-box: view-box;
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .rw-plane.up .rw-gear {
+    transform: scaleY(0);
+  }
+  .rw-puff {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 10px;
+    height: 10px;
+    margin: 0 0 -3px -5px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0;
+  }
+</style>
+
+<script>
+  import { onScroll, reduceMotion, motionPaused, onPauseChange } from '../scripts/frame';
+
+  const tpl = document.querySelector<HTMLTemplateElement>('#gate-runway')!;
+  const BAND_TOP = 0.28; // a gate is "occupied" while its runway is between these
+  const BAND_BOTTOM = 0.8; // fractions of the viewport height
+  const wide = window.matchMedia('(min-width: 768px)'); // tablet and desktop
+  const MIN_RUNWAY = 70; // px; narrower than this and the runway hides
+
+  type Gate = {
+    row: HTMLElement;
+    rw: HTMLElement;
+    plane: SVGSVGElement;
+    puff: HTMLElement;
+    occupied: boolean; // where the plane should be
+    parked: boolean; // where the plane is
+    dir: 1 | -1; // direction of the latest move: 1 = left to right (scrolling down)
+    busy: boolean;
+    pitch: number; // shown nose angle, rate-limited
+    t: number; // time of the last frame, 0 = snap
+  };
+
+  const smooth = (e: number) => e * e * (3 - 2 * e);
+  const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
+  const deg = (r: number) => (r * 180) / Math.PI;
+
+  const gates: Gate[] = [...document.querySelectorAll<HTMLElement>('main > section:not(.hero) .gate')].map((gate) => {
+    const row = document.createElement('div');
+    row.className = 'gate-row' + (gate.classList.contains('on-dark') ? ' on-dark' : '');
+    gate.before(row);
+    row.append(gate, tpl.content.firstElementChild!.cloneNode(true));
+    const rw = row.querySelector<HTMLElement>('.rw')!;
+    return {
+      row,
+      rw,
+      plane: rw.querySelector<SVGSVGElement>('.rw-plane')!,
+      puff: rw.querySelector<HTMLElement>('.rw-puff')!,
+      occupied: false,
+      parked: false,
+      dir: 1,
+      busy: false,
+      pitch: 0,
+      t: 0,
+    };
+  });
+
+  // x: main-wheel position in runway px, measured along the direction of travel
+  const PITCH_RATE = 70; // deg/s: the nose never snaps, however short the runway
+  const place = (g: Gate, W: number, x: number, alt: number, pitch: number, op: number) => {
+    const now = performance.now();
+    if (!g.t) g.pitch = pitch;
+    else {
+      const max = (PITCH_RATE * Math.min(0.05, (now - g.t) / 1000));
+      g.pitch += Math.max(-max, Math.min(max, pitch - g.pitch));
+    }
+    g.t = now;
+    const sx = g.dir === 1 ? x : W - x;
+    g.plane.style.transform = `translate3d(${sx}px, ${-alt}px, 0) rotate(${-g.dir * g.pitch}deg) scaleX(${g.dir})`;
+    g.plane.style.opacity = String(op);
+  };
+
+  const park = (g: Gate, on: boolean) => {
+    g.parked = on;
+    g.plane.classList.remove('up');
+    const W = g.rw.clientWidth;
+    g.t = 0;
+    place(g, W, W * 0.5, 0, 0, on ? 1 : 0);
+    g.t = 0;
+  };
+
+  // room on each side of the runway that stays inside the viewport
+  const room = (g: Gate) => {
+    const r = g.rw.getBoundingClientRect();
+    const vw = document.documentElement.clientWidth;
+    return { left: r.left - 12, right: vw - r.right - 12 };
+  };
+
+  const run = (g: Gate, dur: number, step: (u: number, t: number) => void) =>
+    new Promise<void>((done) => {
+      const t0 = performance.now();
+      const tick = (now: number) => {
+        const t = (now - t0) / 1000;
+        step(Math.min(1, t / dur), t);
+        if (t < dur) requestAnimationFrame(tick);
+        else done();
+      };
+      requestAnimationFrame(tick);
+    });
+
+  const land = (g: Gate) => {
+    const W = g.rw.clientWidth;
+    const behind = g.dir === 1 ? room(g).left : room(g).right;
+    const L = Math.max(80, Math.min(g.row.firstElementChild!.clientWidth + 90, behind)); // approach length
+    const xs = -L; // start, in the air behind the runway threshold
+    const xt = W * 0.1; // touchdown
+    const xp = W * 0.5; // parking spot
+    const A = Math.min(44, (xt - xs) * 0.1); // approach altitude: a shallow ~6° glide
+    const span = xt - xs;
+    // speed falls off evenly (constant deceleration), so where it touches down falls out of that
+    const f = (u: number) => 1 - (1 - u) ** 2;
+    const uTouch = 1 - Math.sqrt(1 - (xt - xs) / (xp - xs));
+    let puffed = false;
+    g.plane.classList.remove('up');
+    g.t = 0;
+
+    return run(g, 1.7, (u, t) => {
+      const x = xs + (xp - xs) * f(u);
+      let alt = 0;
+      let pitch = 0;
+      if (x < xt) {
+        const k = (xt - x) / span;
+        alt = A * k ** 1.4; // flattening glide path = the flare
+        const path = deg(Math.atan((1.4 * A * k ** 0.4) / span)); // descent angle
+        const att = 2 + 6 * (1 - clamp01(alt / 14)); // nose comes up as it nears the ground
+        pitch = att - path;
+      } else {
+        // main gear down; the nose settles over ~0.35 s
+        const since = (u - uTouch) * 1.7;
+        pitch = 8 * (1 - smooth(clamp01(since / 0.35)));
+        if (!puffed) {
+          puffed = true;
+          const px = g.dir === 1 ? xt : W - xt;
+          g.puff.style.left = `${px}px`;
+          g.puff.animate(
+            [
+              { opacity: 0.28, transform: 'scale(0.3)' },
+              { opacity: 0, transform: `translateX(${-g.dir * 10}px) scale(1.6)` },
+            ],
+            { duration: 600, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' },
+          );
+        }
+      }
+      place(g, W, x, alt, pitch, clamp01(t / 0.25));
+    });
+  };
+
+  const takeOff = (g: Gate) => {
+    const W = g.rw.clientWidth;
+    const ahead = g.dir === 1 ? room(g).right : room(g).left;
+    const xp = W * 0.5;
+    const xe = W + Math.max(40, Math.min(240, ahead)); // where it's faded out
+    const xr = xp + (W - xp) * 0.75; // lift-off
+    const C = Math.min(64, (xe - xr) * 0.45) / (xe - xr) ** 1.5; // climb gets steeper as it goes
+    const rot = Math.max(24, W * 0.1); // rotation starts this far before lift-off
+
+    return run(g, 1.6, (u) => {
+      const x = xp + (xe - xp) * u * u; // constant acceleration from a standstill
+      let alt = 0;
+      let path = 0;
+      if (x > xr) {
+        alt = C * (x - xr) ** 1.5;
+        path = deg(Math.atan(1.5 * C * (x - xr) ** 0.5));
+      }
+      const att = 7 * smooth(clamp01((x - (xr - rot)) / rot));
+      g.plane.classList.toggle('up', alt > 6);
+      place(g, W, x, alt, 16 * Math.tanh((path + att * 0.6) / 16), 1 - smooth(clamp01((u - 0.7) / 0.3)));
+    });
+  };
+
+  const onScreen = (g: Gate) => {
+    const r = g.rw.getBoundingClientRect();
+    return r.bottom > 0 && r.top < window.innerHeight;
+  };
+  const still = () => reduceMotion || motionPaused();
+
+  const sync = async (g: Gate) => {
+    if (g.busy || g.occupied === g.parked) return;
+    if (g.rw.classList.contains('off') || still() || !onScreen(g)) return park(g, g.occupied);
+    g.busy = true;
+    const landing = g.occupied;
+    await (landing ? land(g) : takeOff(g));
+    g.busy = false;
+    park(g, landing); // landed = parked, took off = gone
+    // the scroll may have moved on while it was flying
+    sync(g);
+  };
+
+  const settle = (g: Gate) => park(g, g.parked);
+
+  const measure = () =>
+    gates.forEach((g) => g.rw.classList.toggle('off', g.rw.clientWidth < MIN_RUNWAY));
+
+  let lastY = window.scrollY;
+  const check = () => {
+    const vh = window.innerHeight;
+    const sy = window.scrollY;
+    gates.forEach((g) => {
+      const r = g.rw.getBoundingClientRect();
+      const y = (r.top + r.height / 2) / vh;
+      const inBand = y > BAND_TOP && y < BAND_BOTTOM;
+      if (inBand === g.occupied) return;
+      // which way the page is moving; a layout shift with no scroll falls back on position
+      const down = sy !== lastY ? sy > lastY : inBand ? y > 0.5 : y <= BAND_TOP;
+      // phones: scrolling down flies left to right. Wider screens: right to left
+      g.dir = down !== wide.matches ? 1 : -1;
+      g.occupied = inBand;
+      sync(g);
+    });
+    lastY = sy;
+  };
+
+  measure();
+  // start in place: planes already sitting at gates in view, no flights on load
+  const vh = window.innerHeight;
+  gates.forEach((g) => {
+    const r = g.rw.getBoundingClientRect();
+    const y = (r.top + r.height / 2) / vh;
+    g.occupied = y > BAND_TOP && y < BAND_BOTTOM;
+    park(g, g.occupied);
+  });
+  onScroll(check);
+  // images and fonts loading can move gates without any scrolling
+  new ResizeObserver(() => check()).observe(document.querySelector('main')!);
+  window.addEventListener('resize', () => {
+    measure();
+    gates.forEach((g) => !g.busy && settle(g));
+  });
+  onPauseChange(() => gates.forEach((g) => sync(g)));
+</script>
