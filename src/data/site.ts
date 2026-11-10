@@ -209,7 +209,7 @@ export const steps = [
   {
     n: '01',
     title: 'Tell us your plan',
-    body: 'WhatsApp, call, or walk into our office opposite the Police Station.',
+    body: 'WhatsApp, call, or visit our office, wherever your journey starts.',
   },
   {
     n: '02',
@@ -226,7 +226,7 @@ export const steps = [
 export const faqs = [
   {
     q: 'How do I book with Fly With Us?',
-    a: 'Send us a WhatsApp message using the booking form on this page, call us, or visit our office in Mannarkkad. We reply with options and confirm everything before booking.',
+    a: 'Send us a WhatsApp message using the booking form on this page, call us, or visit our office. We reply with options and confirm everything before booking.',
   },
   {
     q: 'Do I have to visit the office?',

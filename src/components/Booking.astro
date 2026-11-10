@@ -26,7 +26,7 @@ const kinds = [
         No accounts, no payment online. Your details open straight in WhatsApp, ready to send to our team, who reply with options and fares.
       </p>
       <ul class="book-points" data-reveal style="--d:3">
-        <li><Icon name="check" size={18} /> Real people, replying from Mannarkkad</li>
+        <li><Icon name="check" size={18} /> Real people reply, not a bot</li>
         <li><Icon name="check" size={18} /> Nothing is booked until you confirm</li>
         <li><Icon name="check" size={18} /> Prefer to talk? <a href={`tel:${business.phones[0].tel}`}>{business.phones[0].label}</a></li>
       </ul>
@@ -58,12 +58,12 @@ const kinds = [
         <div class="row two" data-when="travel">
           <label class="field">
             <span class="mono flabel">From</span>
-            <input name="from" placeholder="Kozhikode / Kochi / Palakkad" autocomplete="off" />
+            <input name="from" placeholder="Any city or airport, e.g. Kochi" autocomplete="off" />
           </label>
           <button type="button" class="swap" aria-label="Swap from and to" data-swap><Icon name="swap" size={18} /></button>
           <label class="field">
             <span class="mono flabel">To</span>
-            <input name="to" placeholder="Dubai, Riyadh, Chennai…" autocomplete="off" />
+            <input name="to" placeholder="Any city or airport, e.g. London" autocomplete="off" />
           </label>
         </div>
 
@@ -606,7 +606,7 @@ const kinds = [
     $('[data-date-label]').textContent = s.travel ? (s.ret ? 'Depart' : 'Travel date') : 'When';
 
     out('service').textContent = s.svc;
-    const f = s.travel ? code(val('from')) : 'MKD';
+    const f = s.travel ? code(val('from')) : 'YOU';
     const t = s.travel ? code(val('to')) : s.visa ? code(val('country')) : '✓';
     const fe = out('from');
     const te = out('to');

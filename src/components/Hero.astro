@@ -28,7 +28,7 @@ const ticker = services.map((s) => s.title.toUpperCase());
 
   <div class="hero-inner wrap">
     <div class="hero-copy">
-      <div class="gate on-dark hero-fade" style="--d:1"><span>Gate 01</span><span>Mannarkkad → The World</span></div>
+      <div class="gate on-dark hero-fade" style="--d:1"><span>Gate 01</span><span>Anywhere → Anywhere</span></div>
 
       <p class="hero-script script hero-fade" style="--d:2">{business.script}</p>
       <h1 class="hero-title display" aria-label="Fly With Us">
@@ -71,20 +71,20 @@ const ticker = services.map((s) => s.title.toUpperCase());
       <div class="pass-route">
         <div>
           <span class="mono label">From</span>
-          <strong>MKD</strong>
-          <span class="small">Mannarkkad</span>
+          <strong data-flap-cycle="COK,DXB,BLR,DOH,LHR,MCT,SIN,JED">COK</strong>
+          <span class="small">Wherever you are</span>
         </div>
         <span class="pass-plane"><Icon name="plane" size={22} /></span>
         <div class="right">
           <span class="mono label">To</span>
-          <strong data-flap-cycle="DXB,DOH,RUH,MCT,KUL,SIN,BKK,MLE">DXB</strong>
-          <span class="small">Anywhere you need</span>
+          <strong data-flap-cycle="DXB,LHR,SIN,COK,YYZ,BOM,KUL,MLE">DXB</strong>
+          <span class="small">Wherever you're going</span>
         </div>
       </div>
       <div class="perf"></div>
       <div class="pass-meta">
         <div><span class="mono label">Passenger</span><span>You</span></div>
-        <div><span class="mono label">Gate</span><span>Opp. Police Stn</span></div>
+        <div><span class="mono label">Desk</span><span>Open 7 days</span></div>
         <div>
           <span class="mono label">Google</span>
           <span class="stars"><Icon name="star" size={13} /> {business.rating} · {business.reviewCount} reviews</span>
@@ -497,12 +497,11 @@ const ticker = services.map((s) => s.title.toUpperCase());
   }
 
   // Boarding-pass destination code cycles like a split-flap display.
-  const flap = document.querySelector<HTMLElement>('[data-flap-cycle]');
-  if (flap && !reduce) {
-    const codes = flap.dataset.flapCycle!.split(',');
+  const flaps = [...document.querySelectorAll<HTMLElement>('[data-flap-cycle]')];
+  if (flaps.length && !reduce) {
     const A = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     let idx = 0;
-    const flipTo = (target: string) => {
+    const flipTo = (flap: HTMLElement, target: string) => {
       let frame = 0;
       const iv = setInterval(() => {
         frame++;
@@ -514,8 +513,11 @@ const ticker = services.map((s) => s.title.toUpperCase());
       }, 45);
     };
     setInterval(() => {
-      idx = (idx + 1) % codes.length;
-      flipTo(codes[idx]);
+      idx++;
+      flaps.forEach((f, k) => {
+        const codes = f.dataset.flapCycle!.split(',');
+        setTimeout(() => flipTo(f, codes[idx % codes.length]), k * 180);
+      });
     }, 2800);
   }
 
