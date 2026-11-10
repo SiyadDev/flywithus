@@ -1,9 +1,18 @@
 ---
 import Icon from './Icon.astro';
-import { business, wa, services, asset } from '../data/site';
+import { business, wa, services, asset, reviews } from '../data/site';
 
 const word = 'FLY WITH US'.split('');
 const ticker = services.map((s) => s.title.toUpperCase());
+
+// Short opening lines from real Google reviews, for the rotating quote.
+const snippets = reviews
+  .map((r) => ({ t: r.text.split(/(?<=[.!])\s/)[0].replace(/[.!…\s]+$/u, ''), n: r.name }))
+  .filter((q) => q.t.length >= 18 && q.t.length <= 70)
+  .slice(0, 5);
+const initials = (n: string) => n.replace(/\./g, '').split(/\s+/).map((p) => p[0]).join('').slice(0, 2).toUpperCase();
+const faces = reviews.slice(0, 4).map((r) => initials(r.name));
+const lastStar = Math.round((business.rating - Math.floor(business.rating)) * 100) || 100;
 ---
 
 <section class="hero" id="top">
@@ -28,7 +37,7 @@ const ticker = services.map((s) => s.title.toUpperCase());
 
   <div class="hero-inner wrap">
     <div class="hero-copy">
-      <div class="gate on-dark hero-fade" style="--d:1"><span>Gate 01</span><span>Anywhere → Anywhere</span></div>
+      <div class="gate on-dark hero-fade" style="--d:1"><span>Gate 01</span><span>Mannarkkad → The World</span></div>
 
       <p class="hero-script script hero-fade" style="--d:2">{business.script}</p>
       <h1 class="hero-title display" aria-label="Fly With Us">
@@ -59,11 +68,44 @@ const ticker = services.map((s) => s.title.toUpperCase());
           <Icon name="whatsapp" size={18} /> Chat on WhatsApp
         </a>
       </div>
+
+      <!-- Google rating, shown on every screen size -->
+      <a class="trust hero-fade" style="--d:10" href="#reviews" data-trust
+        aria-label={`Rated ${business.rating} out of 5 from ${business.reviewCount} Google reviews. Read the reviews.`}>
+        <span class="trust-faces" aria-hidden="true">
+          {faces.map((f, i) => <span class="face" style={`--k:${i}`}>{f}</span>)}
+          <span class="face face-more">+{business.reviewCount - faces.length}</span>
+        </span>
+        <span class="trust-score" aria-hidden="true">
+          <span class="trust-stars">
+            {[0, 1, 2, 3, 4].map((i) => (
+              <span class="tstar" style={`--i:${i}; --fill:${i === 4 ? lastStar : 100}%`}>
+                <Icon name="star" size={18} />
+                <span class="tstar-on"><Icon name="star" size={18} /></span>
+              </span>
+            ))}
+          </span>
+          <span class="trust-line">
+            <b data-trust-count={business.rating}>{business.rating}</b>
+            <span>from {business.reviewCount} Google reviews</span>
+          </span>
+        </span>
+        {snippets.length > 0 && (
+          <span class="trust-quote" aria-hidden="true">
+            {snippets.map((q, i) => (
+              <span class={`tq ${i === 0 ? 'on' : ''}`} data-tq>
+                “{q.t}” <em>{q.n}</em>
+              </span>
+            ))}
+          </span>
+        )}
+        <span class="trust-go" aria-hidden="true"><Icon name="arrow" size={16} /></span>
+      </a>
     </div>
 
     <!-- Boarding pass -->
     <div class="pass-wrap hero-fade" style="--d:9">
-    <aside class="pass" data-tilt aria-label="Rated 4.9 on Google from 121 reviews">
+    <aside class="pass" data-tilt aria-label="Boarding pass: from wherever you are to wherever you're going">
       <div class="pass-top">
         <span class="mono">Boarding pass</span>
         <span class="pass-airline">FLY WITH US</span>
@@ -86,8 +128,8 @@ const ticker = services.map((s) => s.title.toUpperCase());
         <div><span class="mono label">Passenger</span><span>You</span></div>
         <div><span class="mono label">Desk</span><span>Open 7 days</span></div>
         <div>
-          <span class="mono label">Google</span>
-          <span class="stars"><Icon name="star" size={13} /> {business.rating} · {business.reviewCount} reviews</span>
+          <span class="mono label">Hours</span>
+          <span class="stars"><Icon name="clock" size={13} /> 10 am – 8 pm, every day</span>
         </div>
       </div>
       <div class="pass-barcode" aria-hidden="true"></div>
@@ -257,6 +299,205 @@ const ticker = services.map((s) => s.title.toUpperCase());
     to {
       opacity: 1;
       transform: none;
+    }
+  }
+
+
+  /* ── Google rating strip ── */
+  .trust {
+    position: relative;
+    display: inline-grid;
+    grid-template-columns: auto auto;
+    align-items: center;
+    gap: 14px 18px;
+    margin-top: 2rem;
+    padding: 14px 52px 14px 16px;
+    max-width: 100%;
+    border-radius: 18px;
+    background: rgba(4, 10, 46, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    color: #fff;
+    text-decoration: none;
+    transition:
+      border-color 0.4s var(--ease-out),
+      background 0.4s var(--ease-out),
+      transform 0.4s var(--ease-out);
+  }
+  @media (min-width: 760px) {
+    .trust {
+      grid-template-columns: auto auto minmax(0, 1fr);
+      border-radius: 999px;
+      padding-left: 12px;
+    }
+  }
+  @media (hover: hover) {
+    .trust:hover {
+      border-color: rgba(255, 198, 41, 0.6);
+      background: rgba(4, 10, 46, 0.75);
+      transform: translateY(-2px);
+    }
+    .trust:hover .trust-go {
+      transform: translateX(4px);
+      background: var(--signal);
+      color: var(--night);
+    }
+  }
+  .trust-faces {
+    display: flex;
+  }
+  .face {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    margin-left: -9px;
+    border-radius: 50%;
+    border: 2px solid #0a1650;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 0.68rem;
+    color: #fff;
+    background: var(--navy);
+  }
+  .face:first-child {
+    margin-left: 0;
+  }
+  .face:nth-child(2) { background: var(--sky); }
+  .face:nth-child(3) { background: var(--steel); }
+  .face:nth-child(4) { background: #13299a; }
+  .face-more {
+    background: var(--signal) !important;
+    color: var(--night);
+    font-size: 0.62rem;
+  }
+  .js .face {
+    opacity: 0;
+    transform: translateX(-8px) scale(0.8);
+    animation: faceIn 0.6s var(--ease-out) forwards;
+    animation-delay: calc(1500ms + var(--k, 4) * 90ms);
+  }
+  @keyframes faceIn {
+    to { opacity: 1; transform: none; }
+  }
+  .trust-score {
+    display: grid;
+    gap: 2px;
+  }
+  .trust-stars {
+    display: flex;
+    gap: 2px;
+  }
+  .tstar {
+    position: relative;
+    display: inline-flex;
+    color: rgba(255, 255, 255, 0.22);
+  }
+  .tstar-on {
+    position: absolute;
+    inset: 0;
+    display: inline-flex;
+    color: var(--signal);
+    clip-path: inset(0 calc(100% - var(--fill)) 0 0);
+  }
+  .js .tstar-on {
+    clip-path: inset(0 100% 0 0);
+    animation: starFill 0.5s var(--ease-out) forwards;
+    animation-delay: calc(1700ms + var(--i) * 120ms);
+  }
+  @keyframes starFill {
+    to { clip-path: inset(0 calc(100% - var(--fill)) 0 0); }
+  }
+  .trust-line {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    font-size: 0.86rem;
+    color: rgba(255, 255, 255, 0.78);
+    white-space: nowrap;
+  }
+  .trust-line b {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: 1.45rem;
+    line-height: 1;
+    color: #fff;
+    letter-spacing: -0.02em;
+  }
+  .trust-quote {
+    grid-column: 1 / -1;
+    position: relative;
+    display: grid;
+    min-width: 0;
+    padding-top: 12px;
+    border-top: 1px dashed rgba(255, 255, 255, 0.18);
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.88);
+  }
+  @media (min-width: 760px) {
+    .trust-quote {
+      grid-column: auto;
+      padding: 0 0 0 18px;
+      border-top: 0;
+      border-left: 1px dashed rgba(255, 255, 255, 0.22);
+      max-width: 23rem;
+    }
+  }
+  .tq {
+    grid-area: 1 / 1;
+    opacity: 0;
+    transform: translateY(8px);
+    transition:
+      opacity 0.6s var(--ease-out),
+      transform 0.6s var(--ease-out);
+    line-height: 1.4;
+  }
+  .tq.on {
+    opacity: 1;
+    transform: none;
+  }
+  .tq.out {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  .tq em {
+    display: block;
+    font-style: normal;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #a9c8ef;
+    margin-top: 3px;
+  }
+  .trust-go {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    width: 30px;
+    height: 30px;
+    margin-top: -15px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    transition:
+      transform 0.4s var(--ease-out),
+      background 0.4s,
+      color 0.4s;
+  }
+  @media (max-width: 759px) {
+    .trust {
+      display: grid;
+      padding-right: 16px;
+    }
+    .trust-go {
+      display: none;
+    }
+    .trust-line {
+      flex-wrap: wrap;
+      white-space: normal;
+      column-gap: 6px;
+      row-gap: 0;
     }
   }
 
@@ -467,7 +708,8 @@ const ticker = services.map((s) => s.title.toUpperCase());
       const ease = (t: number) => 1 - Math.pow(1 - t, 3);
       const start = performance.now() + 600;
       const dur = 3200;
-      const idleFrom = 0.62;
+      // On phones the plane would park over the text, so it flies across and off-screen instead.
+      const idleFrom = window.innerWidth < 760 ? 1 : 0.62;
       const intro = (now: number) => {
         const t = Math.max(0, Math.min(1, (now - start) / dur));
         const e = ease(t) * idleFrom;
@@ -531,5 +773,39 @@ const ticker = services.map((s) => s.title.toUpperCase());
       tilt.style.transform = `perspective(900px) rotateY(${x * 10}deg) rotateX(${-y * 10}deg)`;
     });
     tilt.addEventListener('pointerleave', () => (tilt.style.transform = ''));
+  }
+  // Rating strip: count up the score and rotate review quotes.
+  const trust = document.querySelector<HTMLElement>('[data-trust]');
+  if (trust) {
+    const num = trust.querySelector<HTMLElement>('[data-trust-count]');
+    if (num && !reduce) {
+      const to = Number(num.dataset.trustCount);
+      num.textContent = '0.0';
+      setTimeout(() => {
+        const t0 = performance.now();
+        const step = (now: number) => {
+          const t = Math.min(1, (now - t0) / 1300);
+          num.textContent = (to * (1 - Math.pow(1 - t, 4))).toFixed(1);
+          if (t < 1) requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+      }, 1600);
+    }
+    const quotes = [...trust.querySelectorAll<HTMLElement>('[data-tq]')];
+    if (quotes.length > 1 && !reduce) {
+      let q = 0;
+      let paused = false;
+      trust.addEventListener('pointerenter', () => (paused = true));
+      trust.addEventListener('pointerleave', () => (paused = false));
+      setInterval(() => {
+        if (paused || document.hidden) return;
+        const cur = quotes[q];
+        q = (q + 1) % quotes.length;
+        cur.classList.remove('on');
+        cur.classList.add('out');
+        setTimeout(() => cur.classList.remove('out'), 600);
+        quotes[q].classList.add('on');
+      }, 4200);
+    }
   }
 </script>
