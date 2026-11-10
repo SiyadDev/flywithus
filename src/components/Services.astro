@@ -1,5 +1,6 @@
 ---
 import Icon from './Icon.astro';
+import { Picture } from 'astro:assets';
 import { services, wa } from '../data/site';
 import SplitHeading from './SplitHeading.astro';
 
@@ -25,12 +26,14 @@ const ask = (t: string) => wa(`Hi Fly With Us, I need help with ${t}.`);
       {
         featured.map((s, i) => (
           <a class={`feat feat-${i}`} href={ask(s.title)} target="_blank" rel="noopener" data-reveal="clip" style={`--d:${i}`}>
-            <img src={s.image} alt="" loading="lazy" />
+            {s.image && (
+              <Picture src={s.image} formats={['avif', 'webp']} widths={[480, 800, 1200]} sizes={i === 0 ? '(min-width: 760px) 56vw, 100vw' : '(min-width: 760px) 42vw, 100vw'} alt="" loading="lazy" decoding="async" />
+            )}
             <span class="feat-shade" />
             <span class="feat-no mono">{String(i + 1).padStart(2, '0')}</span>
             <span class="feat-body">
               <span class="feat-tag mono">{s.short}</span>
-              <span class="feat-title">{s.title}</span>
+              <h3 class="feat-title">{s.title}</h3>
               <span class="feat-text">{s.body}</span>
               <span class="feat-cta">
                 Ask on WhatsApp <Icon name="arrowUpRight" size={16} />
@@ -51,7 +54,7 @@ const ask = (t: string) => wa(`Hi Fly With Us, I need help with ${t}.`);
               </span>
               <span class="mono sign-no">{String(i + featured.length + 1).padStart(2, '0')}</span>
             </span>
-            <span class="sign-title">{s.title}</span>
+            <h3 class="sign-title">{s.title}</h3>
             <span class="sign-short mono">{s.short}</span>
             <span class="sign-text">{s.body}</span>
             <span class="sign-arrow">
@@ -61,7 +64,7 @@ const ask = (t: string) => wa(`Hi Fly With Us, I need help with ${t}.`);
         ))
       }
       <a class="sign sign-cta" href={wa('Hi Fly With Us, I have a travel question.')} target="_blank" rel="noopener" data-reveal style="--d:3">
-        <span class="sign-title">Something else?</span>
+        <h3 class="sign-title">Something else?</h3>
         <span class="sign-text">Not on the list? If it involves travel or travel documents, ask us first.</span>
         <span class="btn btn-wa">
           <Icon name="whatsapp" size={18} /> Ask us
@@ -85,14 +88,15 @@ const ask = (t: string) => wa(`Hi Fly With Us, I need help with ${t}.`);
     .feat-0 {
       grid-row: span 2;
     }
+  }
+  @media (max-width: 759px) {
     .feat {
-      min-height: 0;
+      min-height: 340px;
     }
   }
   .feat {
     position: relative;
     display: block;
-    min-height: 340px;
     border-radius: var(--radius);
     overflow: hidden;
     color: #fff;
@@ -100,7 +104,10 @@ const ask = (t: string) => wa(`Hi Fly With Us, I need help with ${t}.`);
     background: var(--navy-deep);
     isolation: isolate;
   }
-  .feat img {
+  .feat :global(picture) {
+    display: contents;
+  }
+  .feat :global(img) {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -108,14 +115,14 @@ const ask = (t: string) => wa(`Hi Fly With Us, I need help with ${t}.`);
     object-fit: cover;
     z-index: -2;
     transform: scale(1.04);
-    transition: transform 1.2s var(--ease-out);
+    transition: transform 0.6s var(--ease-out);
   }
   .feat-shade {
     position: absolute;
     inset: 0;
     z-index: -1;
     background: linear-gradient(180deg, rgba(5, 13, 58, 0.05) 20%, rgba(5, 13, 58, 0.88) 100%);
-    transition: background 0.6s var(--ease-out);
+    transition: background 0.3s var(--ease-out);
   }
   .feat-no {
     position: absolute;
@@ -137,8 +144,12 @@ const ask = (t: string) => wa(`Hi Fly With Us, I need help with ${t}.`);
     gap: 0.4rem;
   }
   .feat-tag {
-    font-size: 0.72rem;
-    color: #a9c8ef;
+    font-size: var(--label);
+    color: var(--on-navy-soft);
+  }
+  .feat-title,
+  .sign-title {
+    margin: 0;
   }
   .feat-title {
     font-family: var(--font-display);
@@ -191,7 +202,7 @@ const ask = (t: string) => wa(`Hi Fly With Us, I need help with ${t}.`);
       opacity: 1;
       transform: none;
     }
-    .feat:hover img {
+    .feat:hover :global(img) {
       transform: scale(1.1);
     }
     .feat:hover .feat-shade {
@@ -231,9 +242,9 @@ const ask = (t: string) => wa(`Hi Fly With Us, I need help with ${t}.`);
     overflow: hidden;
     isolation: isolate;
     transition:
-      color 0.5s var(--ease-out),
-      border-color 0.5s var(--ease-out),
-      transform 0.5s var(--ease-out);
+      color 0.2s var(--ease-out),
+      border-color 0.2s var(--ease-out),
+      transform 0.25s var(--ease-out);
   }
   .sign::before {
     content: '';
@@ -242,7 +253,7 @@ const ask = (t: string) => wa(`Hi Fly With Us, I need help with ${t}.`);
     z-index: -1;
     background: var(--navy);
     clip-path: circle(0 at 46px 46px);
-    transition: clip-path 0.7s var(--ease-in-out);
+    transition: clip-path 0.32s var(--ease-out);
   }
   .sign-top {
     display: flex;
@@ -260,13 +271,13 @@ const ask = (t: string) => wa(`Hi Fly With Us, I need help with ${t}.`);
     background: var(--navy);
     color: #fff;
     transition:
-      background 0.5s,
-      color 0.5s;
+      background 0.2s,
+      color 0.2s;
   }
   .sign-no {
-    font-size: 0.74rem;
+    font-size: var(--label);
     color: var(--ink-3);
-    transition: color 0.5s;
+    transition: color 0.2s;
   }
   .sign-title {
     font-family: var(--font-display);
@@ -274,18 +285,18 @@ const ask = (t: string) => wa(`Hi Fly With Us, I need help with ${t}.`);
     font-size: 1.28rem;
     line-height: 1.15;
     color: var(--navy);
-    transition: color 0.5s;
+    transition: color 0.2s;
   }
   .sign-short {
-    font-size: 0.68rem;
-    color: var(--sky);
-    transition: color 0.5s;
+    font-size: var(--label);
+    color: var(--sky-text);
+    transition: color 0.2s;
   }
   .sign-text {
     font-size: 0.93rem;
     color: var(--ink-2);
     margin-top: 0.35rem;
-    transition: color 0.5s;
+    transition: color 0.2s;
   }
   .sign-arrow {
     position: absolute;
@@ -298,8 +309,11 @@ const ask = (t: string) => wa(`Hi Fly With Us, I need help with ${t}.`);
     border-radius: 50%;
     background: var(--signal);
     color: var(--night);
-    transform: scale(0) rotate(-45deg);
-    transition: transform 0.5s var(--ease-out);
+    opacity: 0;
+    transform: scale(0.9) rotate(-20deg);
+    transition:
+      opacity 0.2s var(--ease-out),
+      transform 0.25s var(--ease-out);
   }
   @media (hover: hover) {
     .sign:not(.sign-cta):hover {
@@ -319,13 +333,39 @@ const ask = (t: string) => wa(`Hi Fly With Us, I need help with ${t}.`);
       color: #fff;
     }
     .sign:hover .sign-short {
-      color: #a9c8ef;
+      color: var(--on-navy-soft);
     }
     .sign:hover .sign-text {
       color: rgba(255, 255, 255, 0.8);
     }
     .sign:hover .sign-arrow {
+      opacity: 1;
       transform: none;
+    }
+  }
+  @media (max-width: 599px) {
+    .sign {
+      display: grid;
+      grid-template-columns: 46px 1fr;
+      column-gap: 16px;
+      row-gap: 0.2rem;
+      min-height: 0;
+      padding: 18px;
+    }
+    .sign-top {
+      grid-row: 1 / span 3;
+      padding: 0;
+      margin: 0;
+    }
+    .sign-no {
+      display: none;
+    }
+    .sign-text {
+      grid-column: 2;
+      margin-top: 0.2rem;
+    }
+    .sign-cta {
+      display: flex;
     }
   }
   .sign-cta {

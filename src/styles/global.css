@@ -14,15 +14,41 @@
   --card: #fffdf9;
   --ink: #0d1433;
   --ink-2: #3e4566;
-  --ink-3: #6b7190;
+  --ink-3: #5c6283;
   --rule: #d9d4c8;
 
   /* Airport signage accent — used sparingly */
   --signal: #ffc629;
-  --wa: #1fa855;
 
-  --font-display: 'Montserrat', system-ui, sans-serif;
-  --font-body: 'Archivo', system-ui, sans-serif;
+  /* WhatsApp action green, darkened so white text passes WCAG AA (5.3:1) */
+  --wa: #0f7a3c;
+  --wa-hover: #0a5f2e;
+  --wa-bright: #25d366; /* icon accents only, never behind text */
+
+  /* Text-safe tints: --sky / --steel are accents, these are for small text */
+  --sky-text: #1666b0; /* on paper, 5.4:1 */
+  --on-navy-soft: #a9c8ef; /* secondary text on navy */
+  --placeholder: #676c84; /* 5.0:1 on card */
+  --error: #b42318;
+  --steel-deep: #3d6597; /* steel tint that carries white text */
+  --star: #f2a900;
+  --live: #7fe0a3; /* board 'Get fare' status */
+  --flap-active-top: #223082;
+  --flap-active-bottom: #18246b;
+
+  /* Deep surfaces (were hard-coded across components) */
+  --navy-2: #13299a;
+  --board: #030824;
+  --ticker: #040a2e;
+  --flap-top: #17205a;
+  --flap-bottom: #0f174a;
+
+  /* Monospace label floor */
+  --label: 0.75rem;
+  --label-form: 0.8125rem;
+
+  --font-display: 'Montserrat', 'Montserrat Fallback', system-ui, sans-serif;
+  --font-body: 'Archivo', 'Archivo Fallback', system-ui, sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
   --font-script: 'Great Vibes', cursive;
 
@@ -32,6 +58,25 @@
 
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* Size-adjusted local fallbacks: keep line breaks stable while web fonts load */
+@font-face {
+  font-family: 'Montserrat Fallback';
+  src: local('Arial');
+  size-adjust: 113%;
+  ascent-override: 85%;
+  descent-override: 22%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: 'Archivo Fallback';
+  src: local('Arial');
+  size-adjust: 98%;
+  ascent-override: 90%;
+  descent-override: 22%;
+  line-gap-override: 0%;
 }
 
 /* ───────────────────────── Base ───────────────────────── */
@@ -73,6 +118,24 @@ textarea {
 ::selection {
   background: var(--navy);
   color: #fff;
+}
+input,
+textarea {
+  caret-color: var(--sky);
+}
+html {
+  accent-color: var(--navy);
+  scrollbar-color: var(--steel) var(--paper-2);
+}
+p,
+li,
+.lede {
+  text-wrap: pretty;
+}
+h1,
+h2,
+h3 {
+  text-wrap: balance;
 }
 :focus-visible {
   outline: 2px solid var(--sky);
@@ -138,7 +201,7 @@ textarea {
   display: inline-flex;
   align-items: stretch;
   font-family: var(--font-mono);
-  font-size: 0.74rem;
+  font-size: var(--label);
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -219,7 +282,7 @@ textarea {
   --bg: var(--wa);
 }
 .btn-wa::after {
-  background: #168a45;
+  background: var(--wa-hover);
 }
 .btn-light {
   --bg: #fff;
@@ -249,6 +312,12 @@ textarea {
   background: linear-gradient(currentColor, currentColor) 0 100% / 0 1.5px no-repeat;
   transition: background-size 0.4s var(--ease-out);
   padding-bottom: 2px;
+}
+.link-arrow {
+  /* 44px tall tap area without changing the visual rhythm */
+  padding-block: 12px;
+  margin-block: -10px;
+  background-position: 0 calc(100% - 10px);
 }
 .link-arrow:hover {
   background-size: 100% 1.5px;
@@ -329,22 +398,63 @@ textarea {
   transform: none;
 }
 
+/* Reduced motion: drop movement (translate/scale/parallax/marquees), keep short fades
+   and colour feedback so state changes still read. Components add their own rules. */
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
   }
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    transition-delay: 0ms !important;
-  }
   .js [data-reveal],
+  .js [data-reveal='left'],
+  .js [data-reveal='scale'] {
+    transform: none !important;
+    transition: opacity 0.2s ease !important;
+  }
+  .js [data-reveal='clip'] {
+    clip-path: none !important;
+    opacity: 0;
+    transition: opacity 0.2s ease !important;
+  }
+  .js [data-reveal='clip'].in {
+    opacity: 1;
+  }
   .js .split-words .w > span {
+    transform: none !important;
+    transition: none !important;
+  }
+  .btn,
+  .btn::after,
+  .btn .icon {
+    transition-property: background-color, color, box-shadow !important;
+  }
+  .btn:hover,
+  .btn:active {
+    transform: none !important;
+  }
+}
+
+/* "Pause motion" (footer toggle) stops every looping/auto-playing animation. */
+.motion-paused *,
+.motion-paused *::before,
+.motion-paused *::after {
+  animation-play-state: paused !important;
+}
+
+/* Never leave content hidden when printing or if reveal scripts can't run. */
+@media print {
+  .js [data-reveal],
+  .js .split-words .w > span,
+  .js .hero-fade,
+  .js .hero-title .ch {
     opacity: 1 !important;
     transform: none !important;
     clip-path: none !important;
+    animation: none !important;
   }
+}
+.reveal-all [data-reveal],
+.reveal-all .split-words .w > span {
+  opacity: 1 !important;
+  transform: none !important;
+  clip-path: none !important;
 }

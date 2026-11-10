@@ -141,12 +141,11 @@ import { checklists, wa } from '../data/site';
     text-align: left;
     color: var(--ink-2);
     transition:
-      color 0.4s,
-      background 0.4s,
-      padding 0.5s var(--ease-out);
+      color 0.2s,
+      background 0.2s;
   }
   .docs-tab .mono {
-    font-size: 0.7rem;
+    font-size: var(--label);
     color: var(--ink-3);
   }
   .docs-tab .t {
@@ -184,20 +183,27 @@ import { checklists, wa } from '../data/site';
       opacity: 0;
       transform: translateX(-10px);
       transition:
-        opacity 0.4s,
-        transform 0.5s var(--ease-out);
+        opacity 0.2s,
+        transform 0.25s var(--ease-out);
+    }
+    .docs-tab > * {
+      transition: transform 0.25s var(--ease-out);
+    }
+    .docs-tab:hover > * {
+      transform: translateX(0.5rem);
     }
     .docs-tab:hover {
       color: var(--navy);
-      padding-left: 1rem;
     }
     .docs-tab[aria-selected='true'] {
       background: transparent;
       color: var(--navy);
-      padding-left: 1.2rem;
+    }
+    .docs-tab[aria-selected='true'] > * {
+      transform: translateX(0.7rem);
     }
     .docs-tab[aria-selected='true'] .mono {
-      color: var(--sky);
+      color: var(--sky-text);
     }
     .docs-tab[aria-selected='true'] :global(.icon) {
       opacity: 1;
@@ -226,7 +232,20 @@ import { checklists, wa } from '../data/site';
     border-radius: 20px;
     padding: clamp(22px, 3.4vw, 40px);
     box-shadow: 0 30px 60px -40px rgba(11, 31, 126, 0.35);
-    animation: panelIn 0.6s var(--ease-out);
+    animation: panelIn 0.22s var(--ease-out);
+  }
+  /* switching tabs from the keyboard should feel instant: no list stagger */
+  [data-docs].kbd .items li {
+    animation: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .docs-panel,
+    .items li {
+      animation: none;
+    }
+    .docs-tab > * {
+      transform: none !important;
+    }
   }
   @keyframes panelIn {
     from {
@@ -243,8 +262,8 @@ import { checklists, wa } from '../data/site';
     border-bottom: 1px dashed var(--rule);
   }
   .panel-kicker {
-    font-size: 0.68rem;
-    color: var(--sky);
+    font-size: var(--label);
+    color: var(--sky-text);
   }
   .panel-head h3 {
     margin: 0.2rem 0 0;
@@ -294,8 +313,8 @@ import { checklists, wa } from '../data/site';
     margin: 0.6rem 0 0;
   }
   .items li {
-    animation: itemIn 0.6s var(--ease-out) backwards;
-    animation-delay: calc(var(--j) * 60ms);
+    animation: itemIn 0.3s var(--ease-out) backwards;
+    animation-delay: calc(var(--j) * 30ms);
   }
   @keyframes itemIn {
     from {
@@ -389,11 +408,15 @@ import { checklists, wa } from '../data/site';
     panels.forEach((p) => (p.hidden = p.dataset.panel !== id));
   };
   tabs.forEach((t, i) => {
-    t.addEventListener('click', () => select(t.dataset.tab!));
+    t.addEventListener('click', () => {
+      root.classList.remove('kbd');
+      select(t.dataset.tab!);
+    });
     t.addEventListener('keydown', (e) => {
       const k = e.key;
       if (!['ArrowDown', 'ArrowUp', 'ArrowLeft', 'ArrowRight'].includes(k)) return;
       e.preventDefault();
+      root.classList.add('kbd');
       const d = k === 'ArrowDown' || k === 'ArrowRight' ? 1 : -1;
       select(tabs[(i + d + tabs.length) % tabs.length].dataset.tab!, true);
     });

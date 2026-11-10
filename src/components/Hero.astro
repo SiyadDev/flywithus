@@ -1,6 +1,9 @@
 ---
 import Icon from './Icon.astro';
-import { business, wa, services, asset, reviews } from '../data/site';
+import { Picture } from 'astro:assets';
+import { business, wa, services, reviews } from '../data/site';
+import heroSky from '../assets/images/hero-sky.jpg';
+import { heroWidths } from '../data/images';
 
 const word = 'FLY WITH US'.split('');
 const ticker = services.map((s) => s.title.toUpperCase());
@@ -17,7 +20,7 @@ const lastStar = Math.round((business.rating - Math.floor(business.rating)) * 10
 
 <section class="hero" id="top">
   <div class="hero-media" data-parallax="0.25" aria-hidden="true">
-    <img src={asset('/images/hero-sky.jpg')} alt="" fetchpriority="high" />
+    <Picture src={heroSky} formats={['avif', 'webp']} widths={heroWidths} sizes="100vw" alt="" loading="eager" fetchpriority="high" decoding="async" />
   </div>
   <div class="hero-shade" aria-hidden="true"></div>
 
@@ -172,7 +175,10 @@ const lastStar = Math.round((business.rating - Math.floor(business.rating)) * 10
     inset: -8% 0 -8% 0;
     will-change: transform;
   }
-  .hero-media img {
+  .hero-media :global(picture) {
+    display: contents;
+  }
+  .hero-media :global(img) {
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -198,6 +204,15 @@ const lastStar = Math.round((business.rating - Math.floor(business.rating)) * 10
     width: 100%;
     height: 100%;
     pointer-events: none;
+    /* the route stays faint behind the text column and full strength in the open sky */
+    -webkit-mask-image: linear-gradient(90deg, rgba(0, 0, 0, 0.18) 0%, rgba(0, 0, 0, 0.18) 38%, #000 62%);
+    mask-image: linear-gradient(90deg, rgba(0, 0, 0, 0.18) 0%, rgba(0, 0, 0, 0.18) 38%, #000 62%);
+  }
+  @media (max-width: 759px) {
+    .hero-path {
+      -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 12%, rgba(0, 0, 0, 0.15) 22%);
+      mask-image: linear-gradient(180deg, #000 0%, #000 12%, rgba(0, 0, 0, 0.15) 22%);
+    }
   }
   .hero-path path#flightPath {
     stroke: rgba(255, 255, 255, 0.55);
@@ -228,7 +243,7 @@ const lastStar = Math.round((business.rating - Math.floor(business.rating)) * 10
     font-size: clamp(2.4rem, 5.4vw, 4.6rem);
     line-height: 1;
     margin: 0 0 -0.12em 0.08em;
-    color: #a9c8ef;
+    color: var(--on-navy-soft);
     position: relative;
     z-index: 1;
   }
@@ -265,8 +280,8 @@ const lastStar = Math.round((business.rating - Math.floor(business.rating)) * 10
     max-width: min(100%, 44rem);
   }
   .hero-sub .mono {
-    font-size: clamp(0.7rem, 1.2vw, 0.9rem);
-    letter-spacing: 0.4em;
+    font-size: clamp(0.75rem, 1.2vw, 0.9rem);
+    letter-spacing: 0.36em;
     white-space: nowrap;
   }
   .hero-rule {
@@ -302,6 +317,52 @@ const lastStar = Math.round((business.rating - Math.floor(business.rating)) * 10
     }
   }
 
+
+  /* tablet portrait: centre the copy instead of leaving a tall empty sky above it */
+  @media (min-width: 760px) and (max-width: 1079px) and (orientation: portrait) {
+    .hero-inner {
+      margin-block: auto;
+    }
+  }
+  .ticker:hover .ticker-track {
+    animation-play-state: paused;
+  }
+
+  /* Reduced motion: no zoom, slides, flips or ticker; content simply fades in. */
+  @keyframes fadeOnly {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-media :global(img) {
+      animation: none;
+      transform: none;
+    }
+    .js .hero-title .ch {
+      transform: none;
+      animation: none;
+    }
+    .js .hero-fade,
+    .js .face {
+      transform: none;
+      animation: fadeOnly 0.25s ease forwards;
+      animation-delay: 0s;
+    }
+    .js .tstar-on {
+      animation: none;
+      clip-path: inset(0 calc(100% - var(--fill)) 0 0);
+    }
+    .ticker-track {
+      animation: none;
+    }
+    .tq {
+      transform: none !important;
+    }
+  }
 
   /* ── Google rating strip ── */
   .trust {
@@ -352,23 +413,23 @@ const lastStar = Math.round((business.rating - Math.floor(business.rating)) * 10
     height: 34px;
     margin-left: -9px;
     border-radius: 50%;
-    border: 2px solid #0a1650;
+    border: 2px solid var(--navy-deep);
     font-family: var(--font-display);
     font-weight: 800;
-    font-size: 0.68rem;
+    font-size: var(--label);
     color: #fff;
     background: var(--navy);
   }
   .face:first-child {
     margin-left: 0;
   }
-  .face:nth-child(2) { background: var(--sky); }
-  .face:nth-child(3) { background: var(--steel); }
-  .face:nth-child(4) { background: #13299a; }
+  .face:nth-child(2) { background: var(--sky-text); }
+  .face:nth-child(3) { background: var(--steel-deep); }
+  .face:nth-child(4) { background: var(--navy-2); }
   .face-more {
     background: var(--signal) !important;
     color: var(--night);
-    font-size: 0.62rem;
+    font-size: var(--label);
   }
   .js .face {
     opacity: 0;
@@ -463,10 +524,10 @@ const lastStar = Math.round((business.rating - Math.floor(business.rating)) * 10
     display: block;
     font-style: normal;
     font-family: var(--font-mono);
-    font-size: 0.68rem;
+    font-size: var(--label);
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: #a9c8ef;
+    color: var(--on-navy-soft);
     margin-top: 3px;
   }
   .trust-go {
@@ -528,7 +589,7 @@ const lastStar = Math.round((business.rating - Math.floor(business.rating)) * 10
     width: 22px;
     height: 22px;
     border-radius: 50%;
-    background: #0a1b63;
+    background: var(--navy-deep);
   }
   .pass::before {
     left: -11px;
@@ -540,7 +601,7 @@ const lastStar = Math.round((business.rating - Math.floor(business.rating)) * 10
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 0.7rem;
+    font-size: var(--label);
     color: var(--ink-3);
   }
   .pass-airline {
@@ -570,7 +631,7 @@ const lastStar = Math.round((business.rating - Math.floor(business.rating)) * 10
     letter-spacing: -0.02em;
   }
   .label {
-    font-size: 0.62rem;
+    font-size: var(--label);
     color: var(--ink-3);
   }
   .small {
@@ -602,7 +663,7 @@ const lastStar = Math.round((business.rating - Math.floor(business.rating)) * 10
     gap: 6px;
   }
   .stars :global(.icon) {
-    color: #f2a900;
+    color: var(--star);
   }
   .pass-barcode {
     height: 38px;
@@ -623,7 +684,7 @@ const lastStar = Math.round((business.rating - Math.floor(business.rating)) * 10
   .ticker {
     position: relative;
     z-index: 2;
-    background: #040a2e;
+    background: var(--ticker);
     border-top: 1px solid rgba(255, 255, 255, 0.08);
     overflow: hidden;
     padding: 14px 0;
@@ -672,10 +733,13 @@ const lastStar = Math.round((business.rating - Math.floor(business.rating)) * 10
 </style>
 
 <script>
+  import { onScroll, whileVisible, motionPaused, reduceMotion as reduce } from '../scripts/frame';
+
+  const hero = document.getElementById('top')!;
+
   // Plane follows the dotted flight path, drawn in on load.
   const path = document.getElementById('flightPath') as SVGPathElement | null;
   const plane = document.querySelector<SVGGElement>('[data-plane]');
-  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   if (path && plane) {
     const len = path.getTotalLength();
@@ -716,25 +780,21 @@ const lastStar = Math.round((business.rating - Math.floor(business.rating)) * 10
         place(e);
         reveal.style.strokeDashoffset = `${len * (1 - e)}`;
         if (t < 1) requestAnimationFrame(intro);
-        else onScroll();
+        else onScroll(follow); // after the intro, scrolling flies the plane on
       };
       requestAnimationFrame(intro);
 
-      // After intro, scrolling the hero flies the plane on toward the horizon.
-      let ticking = false;
-      const onScroll = () => {
-        if (ticking) return;
-        ticking = true;
-        requestAnimationFrame(() => {
-          const h = window.innerHeight;
-          const k = Math.min(1, Math.max(0, window.scrollY / (h * 0.9)));
-          const e = idleFrom + (1.02 - idleFrom) * k;
-          place(Math.min(1, e));
-          reveal.style.strokeDashoffset = `${len * (1 - Math.min(1, e))}`;
-          ticking = false;
-        });
+      // Scrolling the hero flies the plane toward the horizon; does nothing once it's off screen.
+      let last = -1;
+      const follow = () => {
+        const h = window.innerHeight;
+        const k = Math.min(1, Math.max(0, window.scrollY / (h * 0.9)));
+        if (k === last) return;
+        last = k;
+        const e = Math.min(1, idleFrom + (1.02 - idleFrom) * k);
+        place(e);
+        reveal.style.strokeDashoffset = `${len * (1 - e)}`;
       };
-      setTimeout(() => window.addEventListener('scroll', onScroll, { passive: true }), 600 + dur);
     }
   }
 
@@ -754,13 +814,22 @@ const lastStar = Math.round((business.rating - Math.floor(business.rating)) * 10
         if (frame > 6 + target.length * 3) clearInterval(iv);
       }, 45);
     };
-    setInterval(() => {
-      idx++;
-      flaps.forEach((f, k) => {
-        const codes = f.dataset.flapCycle!.split(',');
-        setTimeout(() => flipTo(f, codes[idx % codes.length]), k * 180);
-      });
-    }, 2800);
+    // Only flips while the hero is on screen and motion isn't paused.
+    let timer: number | undefined;
+    whileVisible(
+      hero,
+      () => {
+        timer = window.setInterval(() => {
+          if (motionPaused()) return;
+          idx++;
+          flaps.forEach((f, k) => {
+            const codes = f.dataset.flapCycle!.split(',');
+            setTimeout(() => flipTo(f, codes[idx % codes.length]), k * 180);
+          });
+        }, 2800);
+      },
+      () => clearInterval(timer),
+    );
   }
 
   // Gentle 3D tilt on the boarding pass
@@ -794,18 +863,27 @@ const lastStar = Math.round((business.rating - Math.floor(business.rating)) * 10
     const quotes = [...trust.querySelectorAll<HTMLElement>('[data-tq]')];
     if (quotes.length > 1 && !reduce) {
       let q = 0;
-      let paused = false;
-      trust.addEventListener('pointerenter', () => (paused = true));
-      trust.addEventListener('pointerleave', () => (paused = false));
-      setInterval(() => {
-        if (paused || document.hidden) return;
-        const cur = quotes[q];
-        q = (q + 1) % quotes.length;
-        cur.classList.remove('on');
-        cur.classList.add('out');
-        setTimeout(() => cur.classList.remove('out'), 600);
-        quotes[q].classList.add('on');
-      }, 4200);
+      let held = false; // hover or keyboard focus holds the current quote
+      trust.addEventListener('pointerenter', () => (held = true));
+      trust.addEventListener('pointerleave', () => (held = false));
+      trust.addEventListener('focusin', () => (held = true));
+      trust.addEventListener('focusout', () => (held = false));
+      let timer: number | undefined;
+      whileVisible(
+        trust,
+        () => {
+          timer = window.setInterval(() => {
+            if (held || motionPaused()) return;
+            const cur = quotes[q];
+            q = (q + 1) % quotes.length;
+            cur.classList.remove('on');
+            cur.classList.add('out');
+            setTimeout(() => cur.classList.remove('out'), 600);
+            quotes[q].classList.add('on');
+          }, 4200);
+        },
+        () => clearInterval(timer),
+      );
     }
   }
 </script>

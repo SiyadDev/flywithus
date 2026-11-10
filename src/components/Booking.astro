@@ -58,12 +58,12 @@ const kinds = [
         <div class="row two" data-when="travel">
           <label class="field">
             <span class="mono flabel">From</span>
-            <input name="from" placeholder="Any city or airport, e.g. Kochi" autocomplete="off" />
+            <input name="from" placeholder="City or airport" autocomplete="off" />
           </label>
           <button type="button" class="swap" aria-label="Swap from and to" data-swap><Icon name="swap" size={18} /></button>
           <label class="field">
             <span class="mono flabel">To</span>
-            <input name="to" placeholder="Any city or airport, e.g. London" autocomplete="off" />
+            <input name="to" placeholder="City or airport" autocomplete="off" />
           </label>
         </div>
 
@@ -99,8 +99,8 @@ const kinds = [
             <span class="err" data-err>Please add your name so we know who to reply to.</span>
           </label>
           <label class="field">
-            <span class="mono flabel">Anything else? <em>(optional)</em></span>
-            <input name="notes" placeholder="Baggage, timing, airline…" />
+            <span class="mono flabel">Anything else?</span>
+            <input name="notes" placeholder="Optional" />
           </label>
         </div>
 
@@ -219,7 +219,7 @@ const kinds = [
     min-width: 0;
   }
   .flabel {
-    font-size: 0.66rem;
+    font-size: var(--label-form);
     color: var(--ink-3);
     padding: 0;
   }
@@ -244,7 +244,11 @@ const kinds = [
     min-height: 44px;
   }
   .field input::placeholder {
-    color: #a6a9b8;
+    color: var(--placeholder);
+    font-weight: 500;
+  }
+  .field input.is-empty {
+    color: var(--placeholder);
     font-weight: 500;
   }
   .field input:focus {
@@ -256,6 +260,25 @@ const kinds = [
     flex-wrap: wrap;
     gap: 8px;
     margin-top: 0.3rem;
+  }
+  @media (max-width: 559px) {
+    .chips {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      scroll-snap-type: x proximity;
+      scrollbar-width: none;
+      margin-inline: calc(clamp(22px, 3.4vw, 36px) * -1);
+      padding: 2px clamp(22px, 3.4vw, 36px) 6px;
+      mask-image: linear-gradient(90deg, transparent, #000 18px, #000 calc(100% - 28px), transparent);
+      -webkit-mask-image: linear-gradient(90deg, transparent, #000 18px, #000 calc(100% - 28px), transparent);
+    }
+    .chips::-webkit-scrollbar {
+      display: none;
+    }
+    .chip {
+      flex: none;
+      scroll-snap-align: start;
+    }
   }
   .chip,
   .pill {
@@ -271,7 +294,8 @@ const kinds = [
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
-    padding: 0.5rem 0.8rem;
+    min-height: 44px;
+    padding: 0.5rem 0.9rem;
     border: 1.5px solid var(--rule);
     border-radius: 999px;
     font-size: 0.85rem;
@@ -279,10 +303,10 @@ const kinds = [
     color: var(--ink-2);
     cursor: pointer;
     transition:
-      background 0.3s,
-      color 0.3s,
-      border-color 0.3s,
-      transform 0.3s var(--ease-out);
+      background 0.2s,
+      color 0.2s,
+      border-color 0.2s,
+      transform 0.16s var(--ease-out);
     user-select: none;
   }
   .chip span:active {
@@ -306,8 +330,10 @@ const kinds = [
     justify-self: start;
   }
   .pill span {
-    display: block;
-    padding: 0.45rem 1rem;
+    display: grid;
+    align-items: center;
+    min-height: 40px;
+    padding: 0 1.1rem;
     border-radius: 999px;
     font-weight: 600;
     font-size: 0.85rem;
@@ -338,8 +364,8 @@ const kinds = [
     }
   }
   .swap {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     border: 1.5px solid var(--rule);
     background: #fff;
@@ -348,8 +374,8 @@ const kinds = [
     place-items: center;
     cursor: pointer;
     transition:
-      transform 0.5s var(--ease-out),
-      border-color 0.3s;
+      transform 0.35s var(--ease-out),
+      border-color 0.2s;
     justify-self: center;
   }
   .swap:hover {
@@ -366,8 +392,8 @@ const kinds = [
     border-bottom: 1.5px solid var(--rule);
   }
   .stepper button {
-    width: 34px;
-    height: 34px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     border: 0;
     background: var(--paper-2);
@@ -389,10 +415,10 @@ const kinds = [
   .err {
     display: none;
     font-size: 0.8rem;
-    color: #c0362c;
+    color: var(--error);
   }
   .field.invalid input {
-    border-color: #c0362c;
+    border-color: var(--error);
   }
   .field.invalid .err {
     display: block;
@@ -424,6 +450,12 @@ const kinds = [
     }
   }
 
+  @media (prefers-reduced-motion: reduce) {
+    .submit.fly .takeoff,
+    .stub-route strong.pop {
+      animation: none;
+    }
+  }
   /* Stub */
   .stub {
     position: relative;
@@ -433,47 +465,51 @@ const kinds = [
     display: grid;
     align-content: space-between;
     gap: 1.2rem;
+    /* phones: a compact stub under the form, torn off along a dashed line */
     border-radius: 0 0 22px 22px;
     border-top: 2px dashed rgba(255, 255, 255, 0.35);
-    order: -1;
-    border-radius: 22px 22px 0 0;
-    border-top: 0;
-    border-bottom: 2px dashed rgba(11, 31, 126, 0.25);
+  }
+  @media (max-width: 759px) {
+    .stub {
+      padding: 20px 22px 22px;
+      gap: 0.9rem;
+    }
+    .stub-route strong {
+      font-size: 2rem !important;
+    }
+    .stub-code {
+      height: 22px !important;
+    }
   }
   @media (min-width: 760px) {
     .stub {
-      order: 0;
       border-radius: 0 22px 22px 0;
-      border-bottom: 0;
+      border-top: 0;
       border-left: 2px dashed rgba(255, 255, 255, 0.35);
-    }
-    .ticket::before,
-    .ticket::after {
-      content: '';
-      position: absolute;
-      right: 229px;
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      background: var(--navy-deep);
-    }
-    .ticket::before {
-      top: -11px;
-    }
-    .ticket::after {
-      bottom: -11px;
     }
   }
   .stub-row {
     display: flex;
     justify-content: space-between;
-    gap: 1rem;
-    font-size: 0.68rem;
-    color: #a9c8ef;
+    gap: 0.25rem 1rem;
+    font-size: var(--label);
+    color: var(--on-navy-soft);
+    white-space: nowrap;
   }
   .stub-svc {
     color: var(--signal);
     text-align: right;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  /* narrow side stub (tablet/desktop): stack the brand above the service */
+  @media (min-width: 760px) {
+    .stub-row {
+      flex-direction: column;
+    }
+    .stub-svc {
+      text-align: left;
+    }
   }
   .stub-route {
     display: flex;
@@ -529,8 +565,8 @@ const kinds = [
     grid-column: 1 / -1;
   }
   .stub-meta .mono {
-    font-size: 0.6rem;
-    color: #a9c8ef;
+    font-size: var(--label);
+    color: var(--on-navy-soft);
   }
   .stub-meta b {
     font-weight: 600;
@@ -654,8 +690,24 @@ const kinds = [
   });
 
   // Dates can't be in the past
-  const today = new Date().toISOString().slice(0, 10);
-  form.querySelectorAll<HTMLInputElement>('input[type=date]').forEach((d) => (d.min = today));
+  // Local date (not UTC), so Indian customers can't pick yesterday between 00:00 and 05:30.
+  const now = new Date();
+  const today = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+  const dates = [...form.querySelectorAll<HTMLInputElement>('input[type=date]')];
+  const markEmpty = () => dates.forEach((d) => d.classList.toggle('is-empty', !d.value));
+  dates.forEach((d) => {
+    d.min = today;
+    d.addEventListener('input', markEmpty);
+    d.addEventListener('change', markEmpty);
+  });
+  const depart = form.elements.namedItem('date') as HTMLInputElement;
+  const ret = form.elements.namedItem('returnDate') as HTMLInputElement;
+  depart.addEventListener('change', () => {
+    ret.min = depart.value || today;
+    if (ret.value && ret.value < ret.min) ret.value = '';
+    markEmpty();
+  });
+  markEmpty();
 
   form.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -686,7 +738,10 @@ const kinds = [
     btn.classList.remove('fly');
     void btn.offsetWidth;
     btn.classList.add('fly');
-    setTimeout(() => window.open(url, '_blank', 'noopener'), 350);
+    // Open synchronously inside the submit gesture: a delayed window.open gets blocked by
+    // Safari and in-app browsers. Phones hand off to the WhatsApp app in the same tab.
+    if (window.matchMedia('(pointer: coarse)').matches) window.location.href = url;
+    else window.open(url, '_blank', 'noopener');
   });
 
   (form.elements.namedItem('name') as HTMLInputElement).addEventListener('input', (e) => {

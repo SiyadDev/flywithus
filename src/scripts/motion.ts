@@ -1,5 +1,8 @@
 // Site-wide motion: scroll reveals, split headings, parallax and counters.
-const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+import { onScroll, reduceMotion as reduce } from './frame';
+
+// Safety net: if reveals can't run (old in-app browsers), show everything.
+if (!('IntersectionObserver' in window)) document.documentElement.classList.add('reveal-all');
 
 // Reveal on scroll. Clip-revealed elements are fully clipped (and so never
 // "intersect"), so we watch their parent and reveal them through it.
@@ -55,34 +58,32 @@ const countIO = new IntersectionObserver(
 );
 document.querySelectorAll('[data-count-to]').forEach((el) => countIO.observe(el));
 
-// Parallax
+// Parallax: one shared scroll listener; reads all rects first, then writes, and skips
+// anything off screen (the hero layer stops once the hero has scrolled away).
 if (!reduce) {
-  const layers = [...document.querySelectorAll<HTMLElement>('[data-parallax]')];
-  const imgs = [...document.querySelectorAll<HTMLElement>('[data-parallax-img]')];
-  let ticking = false;
-  const update = () => {
+  const layers = [...document.querySelectorAll<HTMLElement>('[data-parallax]')].map((el) => ({
+    el,
+    speed: Number(el.dataset.parallax),
+    box: el.parentElement!,
+  }));
+  const imgs = [...document.querySelectorAll<HTMLElement>('[data-parallax-img]')].map((el) => ({
+    el,
+    box: (el.closest('figure') ?? el.parentElement) as HTMLElement,
+  }));
+  onScroll(() => {
     const vh = window.innerHeight;
-    layers.forEach((el) => {
-      const speed = Number(el.dataset.parallax);
-      el.style.transform = `translate3d(0, ${window.scrollY * speed}px, 0)`;
+    const y = window.scrollY;
+    const layerReads = layers.map((l) => l.box.getBoundingClientRect().bottom > 0);
+    const imgReads = imgs.map((m) => m.box.getBoundingClientRect());
+    layers.forEach((l, k) => {
+      if (layerReads[k]) l.el.style.transform = `translate3d(0, ${y * l.speed}px, 0)`;
     });
-    imgs.forEach((el) => {
-      const r = el.parentElement!.getBoundingClientRect();
+    imgs.forEach((m, k) => {
+      const r = imgReads[k];
       if (r.bottom < 0 || r.top > vh) return;
       const p = (r.top + r.height / 2 - vh / 2) / vh;
-      el.style.transform = `translate3d(0, ${p * -40}px, 0)`;
+      m.el.style.transform = `translate3d(0, ${p * -40}px, 0)`;
     });
-    ticking = false;
-  };
-  window.addEventListener(
-    'scroll',
-    () => {
-      if (!ticking) {
-        ticking = true;
-        requestAnimationFrame(update);
-      }
-    },
-    { passive: true },
-  );
-  update();
+  });
 }
+

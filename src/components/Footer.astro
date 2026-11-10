@@ -10,7 +10,7 @@ const year = new Date().getFullYear();
     <div class="foot-cta">
       <p class="script">Ready when you are</p>
       <a class="foot-big" href={wa('Hi Fly With Us, I would like to plan a trip.')} target="_blank" rel="noopener">
-        Let's book your next flight <Icon name="arrowUpRight" size={48} stroke={2.2} />
+        Let's book your next <span class="last">flight<Icon name="arrowUpRight" size={48} stroke={2.2} /></span>
       </a>
     </div>
 
@@ -40,6 +40,10 @@ const year = new Date().getFullYear();
 
     <div class="foot-bottom">
       <span>© {year} {business.fullName}. All rights reserved.</span>
+      <button class="motion-toggle" type="button" data-motion-toggle aria-pressed="false">
+        <span class="when-moving">Pause motion</span>
+        <span class="when-paused">Play motion</span>
+      </button>
       <details class="credits">
         <summary>Photo credits</summary>
         <p>
@@ -67,14 +71,11 @@ const year = new Date().getFullYear();
   }
   .foot-cta .script {
     font-size: clamp(2rem, 4vw, 3.2rem);
-    color: #a9c8ef;
+    color: var(--on-navy-soft);
     margin: 0 0 0.4rem;
   }
   .foot-big {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4em;
-    flex-wrap: wrap;
+    display: inline;
     font-family: var(--font-display);
     font-weight: 900;
     font-size: clamp(2.3rem, 6.4vw, 6rem);
@@ -88,7 +89,13 @@ const year = new Date().getFullYear();
   .foot-big:hover {
     background-size: 100% 4px;
   }
+  .foot-big .last {
+    white-space: nowrap; /* the arrow always sits right after "flight" */
+  }
   .foot-big :global(.icon) {
+    display: inline-block;
+    vertical-align: -0.04em;
+    margin-left: 0.2em;
     width: 0.8em;
     height: 0.8em;
     color: var(--signal);
@@ -104,7 +111,24 @@ const year = new Date().getFullYear();
   }
   @media (min-width: 760px) {
     .foot-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem 2rem;
+    }
+  }
+  @media (min-width: 1080px) {
+    .foot-grid {
       grid-template-columns: 1.4fr 1fr 1fr 1.3fr;
+    }
+  }
+  /* phones: brand + contact full width, the two service lists side by side */
+  @media (max-width: 759px) {
+    .foot-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 2.5rem 1.25rem;
+    }
+    .foot-brand,
+    .foot-grid > div:last-child {
+      grid-column: 1 / -1;
     }
   }
   .foot-brand p {
@@ -114,7 +138,7 @@ const year = new Date().getFullYear();
     align-items: flex-start;
   }
   .h {
-    font-size: 0.7rem;
+    font-size: var(--label);
     color: var(--signal);
     margin: 0 0 1rem;
   }
@@ -137,16 +161,42 @@ const year = new Date().getFullYear();
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
+    align-items: center;
     gap: 1rem;
     padding-top: 1.5rem;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     font-size: 0.8rem;
-    color: rgba(255, 255, 255, 0.5);
+    color: rgba(255, 255, 255, 0.64);
   }
   @media (max-width: 760px) {
     .foot {
       padding-bottom: calc(150px + env(safe-area-inset-bottom));
     }
+  }
+  .motion-toggle {
+    min-height: 44px;
+    padding: 0 16px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    background: transparent;
+    color: rgba(255, 255, 255, 0.8);
+    font-family: var(--font-mono);
+    font-size: var(--label);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+  }
+  .motion-toggle:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+  }
+  .motion-toggle .when-paused,
+  :global(.motion-paused) .motion-toggle .when-moving {
+    display: none;
+  }
+  :global(.motion-paused) .motion-toggle .when-paused {
+    display: inline;
   }
   .credits summary {
     cursor: pointer;
@@ -160,3 +210,15 @@ const year = new Date().getFullYear();
     color: rgba(255, 255, 255, 0.75);
   }
 </style>
+
+<script>
+  import { setMotionPaused } from '../scripts/frame';
+
+  const btn = document.querySelector<HTMLButtonElement>('[data-motion-toggle]')!;
+  const sync = () => btn.setAttribute('aria-pressed', String(document.documentElement.classList.contains('motion-paused')));
+  btn.addEventListener('click', () => {
+    setMotionPaused(!document.documentElement.classList.contains('motion-paused'));
+    sync();
+  });
+  sync();
+</script>

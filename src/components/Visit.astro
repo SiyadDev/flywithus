@@ -1,7 +1,9 @@
 ---
 import Icon from './Icon.astro';
 import SplitHeading from './SplitHeading.astro';
-import { business, wa, asset } from '../data/site';
+import { Picture } from 'astro:assets';
+import { business, wa } from '../data/site';
+import office from '../assets/images/office.webp';
 ---
 
 <section class="section visit" id="visit">
@@ -18,7 +20,7 @@ import { business, wa, asset } from '../data/site';
 
     <div class="visit-grid">
       <figure class="office" data-reveal="clip">
-        <img src={asset('/images/office.webp')} alt="Inside the Fly With Us Tours & Travels office" loading="lazy" data-parallax-img />
+        <Picture src={office} formats={['avif', 'webp']} fallbackFormat="jpg" widths={[480, 800, 1200]} sizes="(min-width: 960px) 55vw, 100vw" alt="Inside the Fly With Us Tours & Travels office" loading="lazy" decoding="async" data-parallax-img />
         <figcaption class="mono">Our office</figcaption>
       </figure>
 
@@ -82,7 +84,10 @@ import { business, wa, asset } from '../data/site';
     overflow: hidden;
     min-height: 340px;
   }
-  .office img {
+  .office :global(picture) {
+    display: contents;
+  }
+  .office :global(img) {
     position: absolute;
     inset: -6% 0;
     width: 100%;
@@ -95,7 +100,7 @@ import { business, wa, asset } from '../data/site';
     bottom: 16px;
     background: var(--signal);
     color: var(--night);
-    font-size: 0.7rem;
+    font-size: var(--label);
     padding: 0.4rem 0.6rem;
     border-radius: 5px;
   }
@@ -120,8 +125,8 @@ import { business, wa, asset } from '../data/site';
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
-    font-size: 0.68rem;
-    color: var(--sky);
+    font-size: var(--label);
+    color: var(--sky-text);
     margin-bottom: 0.3rem;
   }
   .cc-big {

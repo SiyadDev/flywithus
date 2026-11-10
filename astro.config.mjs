@@ -1,10 +1,12 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
+import sitemap from '@astrojs/sitemap';
 
-// GitHub Pages serves the site from /flywithus/, so its deploy workflow sets
-// SITE_URL and BASE_PATH. Local dev and Cloudflare use the defaults (root path).
+// SITE_URL / BASE_PATH are set by the GitHub Pages workflow (site lives at /flywithus/).
+// Cloudflare Pages provides CF_PAGES_URL automatically. Local dev falls back to GitHub Pages.
 export default defineConfig({
-  site: process.env.SITE_URL || 'https://flywithusnow.com',
+  site: process.env.SITE_URL || process.env.CF_PAGES_URL || 'https://siyaddev.github.io',
   base: process.env.BASE_PATH || '/',
+  integrations: [sitemap()],
   server: { port: 4321 },
 });

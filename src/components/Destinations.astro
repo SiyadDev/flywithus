@@ -1,7 +1,15 @@
 ---
 import Icon from './Icon.astro';
 import SplitHeading from './SplitHeading.astro';
+import { getImage } from 'astro:assets';
 import { destinations, wa } from '../data/site';
+
+// Responsive WebP for each city. Only the first photo loads with the page; the board
+// script swaps in the next one just before it is shown (see `load` below).
+const photos = await Promise.all(
+  destinations.map((d) => getImage({ src: d.image, format: 'webp', quality: 70, widths: [480, 800, 1200] })),
+);
+const sizes = '(min-width: 1000px) 45vw, 100vw';
 const msg = (c: string, k: string) => wa(`Hi Fly With Us, can you share fares to ${c} (${k})?`);
 ---
 
@@ -21,7 +29,20 @@ const msg = (c: string, k: string) => wa(`Hi Fly With Us, can you share fares to
       <div class="dest-photo" data-reveal="clip" aria-hidden="true">
         {
           destinations.map((d, i) => (
-            <img src={d.image} alt="" loading="lazy" class={i === 0 ? 'on' : ''} data-photo={d.code} />
+            <img
+              src={i === 0 ? photos[i].src : undefined}
+              srcset={i === 0 ? photos[i].srcSet.attribute : undefined}
+              data-src={photos[i].src}
+              data-srcset={photos[i].srcSet.attribute}
+              sizes={sizes}
+              width={photos[i].attributes.width}
+              height={photos[i].attributes.height}
+              alt=""
+              loading="lazy"
+              decoding="async"
+              class={i === 0 ? 'on' : ''}
+              data-photo={d.code}
+            />
           ))
         }
         <div class="photo-cap">
@@ -101,7 +122,12 @@ const msg = (c: string, k: string) => wa(`Hi Fly With Us, can you share fares to
     border-radius: 18px;
     overflow: hidden;
     aspect-ratio: 4 / 3;
-    background: #0a1650;
+    background: var(--navy-deep);
+  }
+  @media (min-width: 600px) and (max-width: 999px) {
+    .dest-photo {
+      aspect-ratio: 16 / 9;
+    }
   }
   @media (min-width: 1000px) {
     .dest-photo {
@@ -139,7 +165,7 @@ const msg = (c: string, k: string) => wa(`Hi Fly With Us, can you share fares to
     display: grid;
   }
   .photo-cap .mono {
-    font-size: 0.72rem;
+    font-size: var(--label);
     color: var(--signal);
   }
   .photo-cap strong {
@@ -152,7 +178,7 @@ const msg = (c: string, k: string) => wa(`Hi Fly With Us, can you share fares to
 
   /* Board */
   .board {
-    background: #030824;
+    background: var(--board);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 18px;
     padding: 10px 10px 18px;
@@ -178,8 +204,8 @@ const msg = (c: string, k: string) => wa(`Hi Fly With Us, can you share fares to
   }
   .board-head {
     padding: 10px 14px 12px;
-    font-size: 0.64rem;
-    color: rgba(255, 255, 255, 0.45);
+    font-size: var(--label);
+    color: rgba(255, 255, 255, 0.62);
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   }
   .r {
@@ -208,7 +234,7 @@ const msg = (c: string, k: string) => wa(`Hi Fly With Us, can you share fares to
     background: rgba(30, 143, 225, 0.14);
   }
   .row.active .cell {
-    background: linear-gradient(180deg, #223082 0 49%, #18246b 51% 100%);
+    background: linear-gradient(180deg, var(--flap-active-top) 0 49%, var(--flap-active-bottom) 51% 100%);
     box-shadow:
       inset 0 -1px 0 rgba(0, 0, 0, 0.4),
       0 0 14px -4px rgba(255, 198, 41, 0.55);
@@ -224,7 +250,7 @@ const msg = (c: string, k: string) => wa(`Hi Fly With Us, can you share fares to
     width: 30px;
     height: 40px;
     border-radius: 4px;
-    background: linear-gradient(180deg, #17205a 0 49%, #0f174a 51% 100%);
+    background: linear-gradient(180deg, var(--flap-top) 0 49%, var(--flap-bottom) 51% 100%);
     font-family: var(--font-mono);
     font-weight: 600;
     font-size: 1.2rem;
@@ -258,8 +284,8 @@ const msg = (c: string, k: string) => wa(`Hi Fly With Us, can you share fares to
   .city small {
     font-family: var(--font-body);
     font-weight: 400;
-    font-size: 0.78rem;
-    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.66);
   }
   .note {
     font-size: 0.85rem;
@@ -269,10 +295,10 @@ const msg = (c: string, k: string) => wa(`Hi Fly With Us, can you share fares to
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    color: #7fe0a3;
+    color: var(--live);
   }
   .status .mono {
-    font-size: 0.68rem;
+    font-size: var(--label);
   }
   @media (max-width: 420px) {
     .status .mono {
@@ -281,6 +307,12 @@ const msg = (c: string, k: string) => wa(`Hi Fly With Us, can you share fares to
   }
   .row.active .status {
     animation: blink 1.6s steps(2, jump-none) infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .row.active .status,
+    .cell.flip {
+      animation: none;
+    }
   }
   @keyframes blink {
     50% {
@@ -293,6 +325,8 @@ const msg = (c: string, k: string) => wa(`Hi Fly With Us, can you share fares to
     color: rgba(255, 255, 255, 0.6);
   }
   .board-foot a {
+    display: inline-block;
+    padding: 12px 0;
     color: var(--signal);
     font-weight: 600;
     text-decoration: none;
@@ -300,12 +334,13 @@ const msg = (c: string, k: string) => wa(`Hi Fly With Us, can you share fares to
 </style>
 
 <script>
+  import { whileVisible, motionPaused, reduceMotion as reduce } from '../scripts/frame';
+
   const root = document.querySelector<HTMLElement>('[data-board]')!;
   const rows = [...root.querySelectorAll<HTMLAnchorElement>('[data-row]')];
   const photos = [...root.querySelectorAll<HTMLImageElement>('[data-photo]')];
   const capCity = root.querySelector<HTMLElement>('[data-cap-city]')!;
   const capCountry = root.querySelector<HTMLElement>('[data-cap-country]')!;
-  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const A = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
   const flapRow = (row: HTMLElement, delay = 0) => {
@@ -328,37 +363,54 @@ const msg = (c: string, k: string) => wa(`Hi Fly With Us, can you share fares to
     });
   };
 
+  const load = (img: HTMLImageElement) => {
+    if (!img.srcset && img.dataset.srcset) {
+      img.srcset = img.dataset.srcset;
+      img.src = img.dataset.src!;
+    }
+    return img.decode().catch(() => {});
+  };
+
   let current = rows[0].dataset.row;
   const activate = (row: HTMLAnchorElement) => {
     const code = row.dataset.row!;
     if (code === current) return;
     current = code;
     rows.forEach((r) => r.classList.toggle('active', r === row));
-    photos.forEach((p) => p.classList.toggle('on', p.dataset.photo === code));
+    const target = photos.find((p) => p.dataset.photo === code)!;
+    load(target).then(() => {
+      if (current !== code) return; // visitor moved on while it loaded
+      photos.forEach((p) => p.classList.toggle('on', p === target));
+    });
+    // fetch the next city in the background so auto-advance never waits
+    const next = photos[(photos.indexOf(target) + 1) % photos.length];
+    load(next);
     capCity.textContent = row.dataset.city!;
     capCountry.textContent = row.dataset.country!;
     flapRow(row);
   };
 
-  // Board flips in when it scrolls into view
+  // Board flips in the first time it scrolls into view
   const io = new IntersectionObserver(
     (entries) => {
       if (entries.some((e) => e.isIntersecting)) {
         rows.forEach((r, i) => flapRow(r, i * 90));
         io.disconnect();
-        startAuto();
       }
     },
     { threshold: 0.3 },
   );
   io.observe(root);
 
-  // Auto-advance until the visitor interacts
+  // Auto-advance only while the board is on screen, motion isn't paused,
+  // and the visitor hasn't started choosing a city themselves.
   let auto: number | undefined;
   let idx = 0;
+  let touched = false;
   const startAuto = () => {
-    if (reduce) return;
+    if (reduce || touched || auto) return;
     auto = window.setInterval(() => {
+      if (motionPaused()) return;
       idx = (idx + 1) % rows.length;
       activate(rows[idx]);
     }, 3800);
@@ -367,15 +419,20 @@ const msg = (c: string, k: string) => wa(`Hi Fly With Us, can you share fares to
     if (auto) clearInterval(auto);
     auto = undefined;
   };
+  whileVisible(root, startAuto, stopAuto);
+  const takeOver = () => {
+    touched = true;
+    stopAuto();
+  };
 
   rows.forEach((r, i) => {
     r.addEventListener('pointerenter', () => {
-      stopAuto();
+      takeOver();
       idx = i;
       activate(r);
     });
     r.addEventListener('focus', () => {
-      stopAuto();
+      takeOver();
       idx = i;
       activate(r);
     });

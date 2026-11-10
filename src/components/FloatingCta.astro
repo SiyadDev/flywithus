@@ -8,8 +8,8 @@ import { business, wa } from '../data/site';
     <Icon name="phone" size={22} />
   </a>
   <a class="fl fl-wa" href={wa('Hi Fly With Us, I have an enquiry.')} target="_blank" rel="noopener" aria-label="Chat on WhatsApp">
+    <span class="fl-label" aria-hidden="true">Chat with us</span>
     <Icon name="whatsapp" size={28} />
-    <span class="fl-label">Chat with us</span>
   </a>
 </div>
 
@@ -24,11 +24,11 @@ import { business, wa } from '../data/site';
     align-items: flex-end;
     gap: 10px;
     opacity: 0;
-    transform: translateY(30px) scale(0.9);
+    transform: translateY(24px) scale(0.96);
     pointer-events: none;
     transition:
-      opacity 0.5s var(--ease-out),
-      transform 0.6s var(--ease-out);
+      opacity 0.3s var(--ease-out),
+      transform 0.35s var(--ease-out);
   }
   .float.show {
     opacity: 1;
@@ -36,71 +36,108 @@ import { business, wa } from '../data/site';
     pointer-events: auto;
   }
   .fl {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
+    position: relative;
+    display: grid;
+    place-items: center;
     border-radius: 999px;
     text-decoration: none;
-    color: #fff;
-    box-shadow: 0 16px 30px -12px rgba(5, 13, 58, 0.55);
-    transition: transform 0.4s var(--ease-out);
+    box-shadow: 0 14px 28px -12px rgba(5, 13, 58, 0.55);
+    transition: transform 0.2s var(--ease-out);
     -webkit-tap-highlight-color: transparent;
   }
   .fl:active {
-    transform: scale(0.94);
+    transform: scale(0.95);
   }
+  /* White with a navy ring so it stays visible on navy and on paper sections alike */
   .fl-call {
     width: 48px;
     height: 48px;
-    background: var(--navy);
+    background: #fff;
+    color: var(--navy);
+    box-shadow:
+      0 0 0 1.5px rgba(11, 31, 126, 0.18),
+      0 14px 28px -12px rgba(5, 13, 58, 0.55);
   }
   .fl-wa {
+    width: 60px;
     height: 60px;
-    min-width: 60px;
-    padding: 0 16px;
     background: var(--wa);
-    position: relative;
+    color: #fff;
   }
   .fl-wa::before {
     content: '';
     position: absolute;
     inset: 0;
     border-radius: inherit;
-    box-shadow: 0 0 0 0 rgba(31, 168, 85, 0.55);
-    animation: ring 2.6s var(--ease-out) infinite;
+    animation: ring 2.6s var(--ease-out) 3; /* draws attention three times, then rests */
+    animation-delay: 1s;
   }
   @keyframes ring {
     0% {
-      box-shadow: 0 0 0 0 rgba(31, 168, 85, 0.5);
+      box-shadow: 0 0 0 0 rgba(15, 122, 60, 0.5);
     }
     70%,
     100% {
-      box-shadow: 0 0 0 16px rgba(31, 168, 85, 0);
+      box-shadow: 0 0 0 16px rgba(15, 122, 60, 0);
     }
   }
+  /* Hover label slides out from behind the button (transform + opacity only) */
   .fl-label {
+    position: absolute;
+    right: calc(100% + 10px);
+    top: 50%;
+    padding: 0.55rem 0.9rem;
+    border-radius: 999px;
+    background: var(--night);
+    color: #fff;
     font-family: var(--font-display);
     font-weight: 700;
-    font-size: 0.9rem;
-    max-width: 0;
-    overflow: hidden;
+    font-size: 0.88rem;
     white-space: nowrap;
-    transition: max-width 0.5s var(--ease-out);
+    opacity: 0;
+    transform: translate(8px, -50%);
+    pointer-events: none;
+    transition:
+      opacity 0.2s var(--ease-out),
+      transform 0.2s var(--ease-out);
   }
   @media (hover: hover) {
     .fl:hover {
-      transform: translateY(-3px);
+      transform: translateY(-2px);
     }
-    .fl-wa:hover .fl-label {
-      max-width: 140px;
+    .fl-wa:hover .fl-label,
+    .fl-wa:focus-visible .fl-label {
+      opacity: 1;
+      transform: translate(0, -50%);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .fl-wa::before {
+      animation: none;
+    }
+    .float {
+      transform: none;
     }
   }
 </style>
 
 <script>
+  import { onScroll } from '../scripts/frame';
+
   const el = document.querySelector<HTMLElement>('[data-float]')!;
-  const onScroll = () => el.classList.toggle('show', window.scrollY > window.innerHeight * 0.6);
-  window.addEventListener('scroll', onScroll, { passive: true });
-  onScroll();
+  const book = document.getElementById('book');
+  let bookOnScreen = false;
+  // Hide while the booking form is on screen (it has its own send button) and while the menu is open.
+  if (book) {
+    new IntersectionObserver(([e]) => {
+      bookOnScreen = e.isIntersecting;
+      update();
+    }, { rootMargin: '-20% 0px -20% 0px' }).observe(book);
+  }
+  const update = () => {
+    const menuOpen = document.documentElement.classList.contains('menu-open');
+    el.classList.toggle('show', window.scrollY > window.innerHeight * 0.6 && !bookOnScreen && !menuOpen);
+  };
+  onScroll(update);
+  new MutationObserver(update).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
 </script>

@@ -82,7 +82,7 @@ const links = [
     transition: color 0.4s;
   }
   .nav :global(.logo-script) {
-    color: #a9c8ef;
+    color: var(--on-navy-soft);
   }
   .nav.scrolled {
     background: rgba(246, 244, 239, 0.88);
@@ -168,7 +168,10 @@ const links = [
       display: none;
     }
     .nav-wa {
-      padding: 0.7rem;
+      padding: 0;
+      width: 44px;
+      height: 44px;
+      justify-content: center;
     }
   }
   @media (min-width: 1080px) {
@@ -196,7 +199,20 @@ const links = [
     flex-direction: column;
     justify-content: space-between;
     clip-path: circle(0 at calc(100% - 40px) 40px);
-    transition: clip-path 0.7s var(--ease-in-out);
+    transition: clip-path 0.42s var(--ease-drawer);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .drawer {
+      clip-path: none;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    .drawer.open {
+      opacity: 1;
+    }
+    .drawer nav a {
+      transform: none !important;
+    }
   }
   .drawer.open {
     clip-path: circle(150% at calc(100% - 40px) 40px);
@@ -223,7 +239,7 @@ const links = [
   .drawer.open nav a {
     opacity: 1;
     transform: none;
-    transition-delay: calc(0.2s + var(--i) * 50ms);
+    transition-delay: calc(0.12s + var(--i) * 35ms);
   }
   .drawer nav a .mono {
     font-size: 0.75rem;
@@ -246,43 +262,86 @@ const links = [
 </style>
 
 <script>
+  import { onScroll } from '../scripts/frame';
+
   const nav = document.querySelector<HTMLElement>('[data-nav]')!;
   const burger = nav.querySelector<HTMLButtonElement>('[data-burger]')!;
   const drawer = nav.querySelector<HTMLElement>('[data-drawer]')!;
+  const outside = [...document.querySelectorAll<HTMLElement>('main, footer, [data-float]')];
+  const html = document.documentElement;
   let lastY = window.scrollY;
   let open = false;
+  let savedY = 0;
 
-  const onScroll = () => {
+  onScroll(() => {
+    if (open) return;
     const y = window.scrollY;
     nav.classList.toggle('scrolled', y > 40);
-    if (!open) nav.classList.toggle('hide', y > 600 && y > lastY + 4);
-    if (y < lastY - 4) nav.classList.remove('hide');
+    if (y > 600 && y > lastY + 4) nav.classList.add('hide');
+    else if (y < lastY - 4) nav.classList.remove('hide');
     lastY = y;
-  };
-  window.addEventListener('scroll', onScroll, { passive: true });
-  onScroll();
+  });
 
+  // Menu: lock the page behind (iOS-safe), make it inert, and move focus into the menu.
   const setOpen = (v: boolean) => {
+    if (v === open) return;
     open = v;
     burger.setAttribute('aria-expanded', String(v));
     burger.setAttribute('aria-label', v ? 'Close menu' : 'Open menu');
     nav.classList.toggle('menu-open', v);
-    document.body.style.overflow = v ? 'hidden' : '';
+    html.classList.toggle('menu-open', v);
+    outside.forEach((el) => (el.inert = v));
     if (v) {
+      savedY = window.scrollY;
+      Object.assign(document.body.style, { position: 'fixed', top: `-${savedY}px`, left: '0', right: '0' });
       drawer.hidden = false;
-      requestAnimationFrame(() => requestAnimationFrame(() => drawer.classList.add('open')));
+      requestAnimationFrame(() =>
+        requestAnimationFrame(() => {
+          drawer.classList.add('open');
+          drawer.querySelector<HTMLAnchorElement>('a')?.focus({ preventScroll: true });
+        }),
+      );
     } else {
+      Object.assign(document.body.style, { position: '', top: '', left: '', right: '' });
+      window.scrollTo({ top: savedY, behavior: 'instant' as ScrollBehavior });
       drawer.classList.remove('open');
       setTimeout(() => {
         if (!open) drawer.hidden = true;
-      }, 700);
+      }, 420);
     }
   };
   burger.addEventListener('click', () => setOpen(!open));
-  drawer.querySelectorAll('[data-drawer-link]').forEach((a) => a.addEventListener('click', () => setOpen(false)));
-  window.addEventListener('keydown', (e) => e.key === 'Escape' && open && setOpen(false));
+  // Menu links: close first (restores scroll), then follow the link.
+  drawer.querySelectorAll<HTMLAnchorElement>('[data-drawer-link]').forEach((a) =>
+    a.addEventListener('click', (e) => {
+      e.preventDefault();
+      setOpen(false);
+      requestAnimationFrame(() => document.querySelector(a.hash)?.scrollIntoView({ behavior: 'smooth' }));
+      history.replaceState(null, '', a.hash);
+    }),
+  );
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && open) {
+      setOpen(false);
+      burger.focus();
+    }
+  });
+  // Keep Tab inside the open menu (burger + menu links + menu buttons).
+  nav.addEventListener('keydown', (e) => {
+    if (!open || e.key !== 'Tab') return;
+    const items = [burger, ...drawer.querySelectorAll<HTMLElement>('a')];
+    const first = items[0];
+    const last = items[items.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  });
 
-  // Active section highlight
+  // Active section highlight; sections without a menu link clear it.
   const links = [...nav.querySelectorAll<HTMLAnchorElement>('[data-navlink]')];
   const io = new IntersectionObserver(
     (entries) => {
@@ -294,8 +353,5 @@ const links = [
     },
     { rootMargin: '-45% 0px -50% 0px' },
   );
-  links.forEach((l) => {
-    const t = document.querySelector(l.hash);
-    if (t) io.observe(t);
-  });
+  document.querySelectorAll('main > section[id]').forEach((sec) => io.observe(sec));
 </script>
