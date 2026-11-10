@@ -1,6 +1,6 @@
 name: Deploy to GitHub Pages
 
-# Builds the site and publishes it at https://siyaddev.github.io/flywithus/
+# Builds the site and publishes it at https://flywithustravels.com
 # on every push to main. Review-update workflows also start this directly,
 # because pushes made by GitHub Actions don't trigger other workflows.
 on:
@@ -32,8 +32,7 @@ jobs:
 
       - name: Build
         env:
-          SITE_URL: https://siyaddev.github.io
-          BASE_PATH: /flywithus
+          SITE_URL: https://flywithustravels.com
         run: npm run build
 
       - uses: actions/upload-pages-artifact@v3

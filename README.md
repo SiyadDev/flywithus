@@ -42,20 +42,14 @@ current numbers. If you edit `reviews.json` by hand, run `npm run reviews:form` 
 
 Review **quotes** are picked by hand; ask the developer to refresh them now and then.
 
-## Live preview (GitHub Pages)
+## Live site (GitHub Pages)
 
-**https://siyaddev.github.io/flywithus/** — rebuilt automatically on every push to `main` and after every review
-update (`.github/workflows/pages.yml`). The workflow builds with `BASE_PATH=/flywithus`; use `asset('/images/…')`
-for any new image path so it works both here and at a root domain.
+**https://flywithustravels.com**: rebuilt automatically on every push to `main` and after every review
+update (`.github/workflows/pages.yml`).
 
-## Deploy (Cloudflare)
-
-In Cloudflare: **Workers & Pages → Create → Pages → Connect to Git** → pick `SiyadDev/flywithus`.
-
-- Framework preset: **Astro** · Build command: `npm run build` · Output directory: `dist`
-- Node version is pinned by `.node-version` (22).
-
-Every push to `main` (including the weekly review updates) redeploys automatically.
+- The domain is registered at Cloudflare; its DNS points at GitHub Pages (records **DNS only**, not proxied).
+- `public/CNAME` tells GitHub Pages which domain to serve; keep it.
+- Use `asset('/images/…')` for any new image path so it still works if the site is ever built under a sub-path.
 
 ## Photos
 
