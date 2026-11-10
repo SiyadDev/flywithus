@@ -24,6 +24,8 @@
   --wa: #0f7a3c;
   --wa-hover: #0a5f2e;
   --wa-bright: #25d366; /* icon accents only, never behind text */
+  --wa-bubble: #e3f4e8;
+  --wa-bubble-ink: #10331f;
 
   /* Text-safe tints: --sky / --steel are accents, these are for small text */
   --sky-text: #1666b0; /* on paper, 5.4:1 */

@@ -1,0 +1,316 @@
+---
+import Icon from './Icon.astro';
+---
+
+<dialog class="wa-sheet" data-wa-sheet aria-labelledby="wa-title" aria-describedby="wa-desc">
+  <div class="wa-card">
+    <span class="wa-grip" aria-hidden="true"></span>
+
+    <div class="wa-head">
+      <span class="wa-icon" aria-hidden="true"><Icon name="whatsapp" size={22} /></span>
+      <h2 id="wa-title" class="wa-title">Chat on WhatsApp?</h2>
+    </div>
+
+    <p id="wa-desc" class="wa-preview" data-wa-bubble><span data-wa-text></span></p>
+
+    <button class="btn btn-wa wa-go" type="button" data-wa-go autofocus>
+      <Icon name="whatsapp" size={18} /> Open WhatsApp
+    </button>
+
+    <div class="wa-foot">
+      <label class="wa-skip">
+        <input type="checkbox" data-wa-skip />
+        <span class="box" aria-hidden="true"><Icon name="check" size={12} stroke={3} /></span>
+        Don't ask again
+      </label>
+      <button class="wa-cancel" type="button" data-wa-cancel>Cancel</button>
+    </div>
+  </div>
+</dialog>
+
+<style>
+  .wa-sheet {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    max-width: none;
+    max-height: none;
+    width: 100%;
+    margin: auto auto 0;
+    overflow: visible;
+    color: var(--ink);
+  }
+  .wa-sheet::backdrop {
+    background: rgba(5, 13, 58, 0.5);
+  }
+  .wa-card {
+    background: var(--card);
+    border-radius: 20px 20px 0 0;
+    padding: 10px 20px calc(10px + env(safe-area-inset-bottom));
+    box-shadow: 0 -16px 48px -20px rgba(5, 13, 58, 0.5);
+    display: grid;
+    gap: 16px;
+  }
+  .wa-grip {
+    justify-self: center;
+    width: 36px;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--rule);
+    margin-bottom: 2px;
+  }
+  @media (min-width: 640px) {
+    .wa-sheet {
+      width: min(380px, calc(100% - 32px));
+      margin: auto;
+    }
+    .wa-card {
+      border-radius: 20px;
+      padding: 24px 24px 12px;
+      box-shadow: 0 30px 70px -28px rgba(5, 13, 58, 0.6);
+    }
+    .wa-grip {
+      display: none;
+    }
+  }
+
+  /* motion: slide up on phones, rise + fade on desktop */
+  .wa-sheet[open] .wa-card {
+    animation: waIn 0.3s var(--ease-drawer);
+  }
+  .wa-sheet[open]::backdrop {
+    animation: waFade 0.25s ease;
+  }
+  .wa-sheet.closing .wa-card {
+    animation: waOut 0.18s ease-in forwards;
+  }
+  .wa-sheet.closing::backdrop {
+    animation: waFade 0.18s ease reverse forwards;
+  }
+  @keyframes waIn {
+    from {
+      transform: translateY(100%);
+    }
+  }
+  @keyframes waOut {
+    to {
+      transform: translateY(100%);
+    }
+  }
+  @media (min-width: 640px) {
+    @keyframes waIn {
+      from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.98);
+      }
+    }
+    @keyframes waOut {
+      to {
+        opacity: 0;
+        transform: translateY(6px) scale(0.98);
+      }
+    }
+  }
+  @keyframes waFade {
+    from {
+      opacity: 0;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .wa-sheet[open] .wa-card {
+      animation: waFade 0.2s ease;
+    }
+    .wa-sheet.closing .wa-card {
+      animation: waFade 0.18s ease reverse forwards;
+    }
+  }
+
+  .wa-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .wa-icon {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--wa-bubble);
+    color: var(--wa);
+  }
+  .wa-title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 1.2rem;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: var(--navy);
+  }
+
+  /* quiet preview of the message: two lines, same paper tone as the rest of the site */
+  .wa-preview {
+    margin: 0;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: var(--paper-2);
+    color: var(--ink-2);
+    font-size: 0.93rem;
+    line-height: 1.45;
+  }
+  .wa-preview span {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .wa-preview span::before {
+    content: '“';
+  }
+  .wa-preview span::after {
+    content: '”';
+  }
+  .wa-preview[hidden] {
+    display: none;
+  }
+
+  .wa-go {
+    justify-content: center;
+    width: 100%;
+    min-height: 52px;
+    font-size: 1rem;
+  }
+
+  .wa-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: -4px;
+  }
+  .wa-skip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    font-size: 0.88rem;
+    color: var(--ink-3);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .wa-skip input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .wa-skip .box {
+    flex: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 5px;
+    border: 1.5px solid var(--ink-3);
+    display: grid;
+    place-items: center;
+    color: #fff;
+    transition:
+      background 0.15s,
+      border-color 0.15s;
+  }
+  .wa-skip .box :global(.icon) {
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  .wa-skip input:checked + .box {
+    background: var(--navy);
+    border-color: var(--navy);
+  }
+  .wa-skip input:checked + .box :global(.icon) {
+    opacity: 1;
+  }
+  .wa-skip input:focus-visible + .box {
+    outline: 2px solid var(--sky);
+    outline-offset: 2px;
+  }
+  .wa-cancel {
+    min-height: 44px;
+    padding: 0 6px 0 16px;
+    border: 0;
+    background: transparent;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--navy);
+    cursor: pointer;
+    border-radius: 8px;
+  }
+  .wa-cancel:hover {
+    color: var(--sky-text);
+  }
+</style>
+
+<script>
+  import { go, parseWa, registerAsker, setSkipConfirm, openWhatsApp, type WaTarget } from '../scripts/whatsapp';
+
+  const dlg = document.querySelector<HTMLDialogElement>('[data-wa-sheet]')!;
+  const textEl = dlg.querySelector<HTMLElement>('[data-wa-text]')!;
+  const bubble = dlg.querySelector<HTMLElement>('[data-wa-bubble]')!;
+  const skip = dlg.querySelector<HTMLInputElement>('[data-wa-skip]')!;
+  let pending: WaTarget | null = null;
+
+  // "Hello! ✈️\n\n*Service:* Flight…" -> "Hello! ✈️ · Service: Flight…" for a short readable preview
+  const preview = (t: string) =>
+    t
+      .replace(/\*/g, '')
+      .split('\n')
+      .map((l) => l.trim())
+      .filter(Boolean)
+      .join(' · ');
+
+  const close = () => {
+    if (!dlg.open) return;
+    dlg.classList.add('closing');
+    setTimeout(() => {
+      dlg.classList.remove('closing');
+      dlg.close();
+    }, 180);
+  };
+
+  registerAsker((t) => {
+    pending = t;
+    textEl.textContent = preview(t.text);
+    bubble.hidden = !t.text.trim();
+    skip.checked = false;
+    dlg.showModal();
+  });
+
+  dlg.querySelector('[data-wa-go]')!.addEventListener('click', () => {
+    if (!pending) return;
+    if (skip.checked) setSkipConfirm(true);
+    const t = pending;
+    pending = null;
+    dlg.close();
+    go(t); // still inside the tap, so Safari allows it
+  });
+  dlg.querySelectorAll('[data-wa-cancel]').forEach((b) => b.addEventListener('click', close));
+  dlg.addEventListener('cancel', (e) => {
+    e.preventDefault(); // Escape: use our closing animation
+    close();
+  });
+  // tap on the dimmed backdrop closes it
+  dlg.addEventListener('click', (e) => {
+    if (e.target === dlg) close();
+  });
+
+  // Every wa.me link on the page goes through the confirmation.
+  document.addEventListener('click', (e) => {
+    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    const a = (e.target as Element).closest?.('a[href]') as HTMLAnchorElement | null;
+    if (!a) return;
+    const t = parseWa(a.href);
+    if (!t) return;
+    e.preventDefault();
+    openWhatsApp(t);
+  });
+</script>

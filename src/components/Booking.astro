@@ -585,6 +585,7 @@ const kinds = [
 
 <script>
   import { business } from '../data/site';
+  import { openWhatsApp } from '../scripts/whatsapp';
 
   const form = document.querySelector<HTMLFormElement>('[data-book]')!;
   const $ = <T extends Element = HTMLInputElement>(s: string) => form.querySelector<T>(s)!;
@@ -733,15 +734,12 @@ const kinds = [
     lines.push(`*Name:* ${val('name').trim()}`);
     if (val('notes').trim()) lines.push(`*Notes:* ${val('notes').trim()}`);
 
-    const url = `https://wa.me/${business.whatsapp}?text=${encodeURIComponent(lines.join('\n'))}`;
     const btn = form.querySelector<HTMLButtonElement>('.submit')!;
     btn.classList.remove('fly');
     void btn.offsetWidth;
     btn.classList.add('fly');
-    // Open synchronously inside the submit gesture: a delayed window.open gets blocked by
-    // Safari and in-app browsers. Phones hand off to the WhatsApp app in the same tab.
-    if (window.matchMedia('(pointer: coarse)').matches) window.location.href = url;
-    else window.open(url, '_blank', 'noopener');
+    // Same confirmation + device routing as every other WhatsApp link (see scripts/whatsapp.ts).
+    openWhatsApp({ phone: business.whatsapp, text: lines.join('\n') });
   });
 
   (form.elements.namedItem('name') as HTMLInputElement).addEventListener('input', (e) => {
