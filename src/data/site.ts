@@ -267,7 +267,7 @@ export const reviews: { name: string; text: string; when?: string; tag?: string 
 export const ratingBreakdown = reviewData.breakdown;
 
 export const photoCredits = [
-  { what: 'Sky', who: 'Harry Knight (CC0)', url: 'https://commons.wikimedia.org/wiki/File:In_flight_above_scattered_clouds_(Unsplash).jpg' },
+  { what: 'Sunset over the wing', who: 'Pinakpani (CC BY-SA 4.0)', url: 'https://commons.wikimedia.org/wiki/File:Aircraft_cabin_window_views_of_sunset,_a_flight_towards_Kolkata_from_Hyderabad_05.jpg' },
   { what: 'Dubai', who: 'imran shahabuddin (CC BY 2.0)', url: 'https://commons.wikimedia.org/wiki/File:Burj_Khalifa_(worlds_tallest_building)_and_the_Dubai_skyline_(25781049892).jpg' },
   { what: 'Riyadh', who: 'B.alotaby (CC BY-SA 4.0)', url: 'https://commons.wikimedia.org/wiki/File:Riyadh_Skyline_showing_the_King_Abdullah_Financial_District_(KAFD)_and_the_famous_Kingdom_Tower_.jpg' },
   { what: 'Doha', who: 'Zairon (CC BY 4.0)', url: 'https://commons.wikimedia.org/wiki/File:Doha_Skyline_02.jpg' },

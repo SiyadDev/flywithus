@@ -2,7 +2,7 @@
 import Icon from './Icon.astro';
 import { Picture } from 'astro:assets';
 import { business, wa, services, reviews } from '../data/site';
-import heroSky from '../assets/images/hero-sky.jpg';
+import heroSky from '../assets/images/hero-wing-sunset.jpg';
 import { heroWidths } from '../data/images';
 
 const word = 'FLY WITH US'.split('');
@@ -182,7 +182,8 @@ const lastStar = Math.round((business.rating - Math.floor(business.rating)) * 10
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: 30% 60%;
+    object-position: 50% 88%; /* lift the golden horizon and the wing into the open sky */
+    filter: saturate(1.15) brightness(1.1);
     transform: scale(1.12);
     animation: heroZoom 2.4s var(--ease-out) forwards;
   }
@@ -195,8 +196,10 @@ const lastStar = Math.round((business.rating - Math.floor(business.rating)) * 10
     position: absolute;
     inset: 0;
     background:
-      linear-gradient(100deg, rgba(5, 13, 58, 0.94) 0%, rgba(7, 20, 90, 0.82) 38%, rgba(11, 31, 126, 0.25) 70%, rgba(11, 31, 126, 0.05) 100%),
-      linear-gradient(0deg, rgba(5, 13, 58, 0.9) 0%, rgba(5, 13, 58, 0) 35%);
+      /* dark navy only behind the copy; the sunset and wing on the right stay warm */
+      linear-gradient(100deg, rgba(5, 13, 58, 0.9) 0%, rgba(5, 13, 58, 0.72) 34%, rgba(5, 13, 58, 0.18) 62%, rgba(5, 13, 58, 0) 82%),
+      linear-gradient(0deg, rgba(5, 13, 58, 0.85) 0%, rgba(5, 13, 58, 0) 28%),
+      linear-gradient(180deg, rgba(5, 13, 58, 0.45) 0%, rgba(5, 13, 58, 0) 18%);
   }
   .hero-path {
     position: absolute;
@@ -318,6 +321,12 @@ const lastStar = Math.round((business.rating - Math.floor(business.rating)) * 10
   }
 
 
+  /* phones: slide the crop right so the wing tip stays in frame */
+  @media (max-width: 759px) {
+    .hero-media :global(img) {
+      object-position: 96% 80%;
+    }
+  }
   /* tablet portrait: centre the copy instead of leaving a tall empty sky above it */
   @media (min-width: 760px) and (max-width: 1079px) and (orientation: portrait) {
     .hero-inner {
@@ -727,7 +736,7 @@ const lastStar = Math.round((business.rating - Math.floor(business.rating)) * 10
     }
     .hero-shade {
       background:
-        linear-gradient(180deg, rgba(5, 13, 58, 0.55) 0%, rgba(5, 13, 58, 0.75) 45%, rgba(5, 13, 58, 0.96) 100%);
+        linear-gradient(180deg, rgba(5, 13, 58, 0.5) 0%, rgba(5, 13, 58, 0.2) 22%, rgba(5, 13, 58, 0.72) 48%, rgba(5, 13, 58, 0.95) 100%);
     }
   }
 </style>
